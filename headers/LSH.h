@@ -1,4 +1,5 @@
 #pragma once
+
 #include<string>
 #include "../headers/hash.h"
 
@@ -18,8 +19,12 @@ public:
 
 	LSH(int k=4, int L=5, std::string inputFile = "input_file", std::string outputFile="output_file"); //constructor
 
-	void LSH_resize(int L);
+
 
 
 
 };
+
+/*parse command line parameters*/
+void initParameters(int* k, int* L, std::string & input_file, std::string & output_file, std::string & query_file,int argc, char** argv);
+

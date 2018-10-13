@@ -5,16 +5,23 @@
 #include <sstream>
 #include <cmath>
 #include "../headers/GenericVector.h"
-#include "GenericVector.cpp"
+#include "../headers/LSH.h"
+
 
 using namespace std;
 
-int main() {
+int main(int argc, char **argv) {
 	GenericVector <int> vec(DIMENSION);
 	string line;
 	ifstream inputFile("src/input_small", ios::in);
 
+	int k,L;
+	string input_file, output_file, query_file;
 
+	initParameters(&k, &L, input_file, output_file, query_file, argc, argv);
+	cout << k << endl;
+	cout << L << endl;
+	cout << output_file << endl;
 
 
 	int value;

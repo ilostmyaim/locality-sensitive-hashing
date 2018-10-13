@@ -3,18 +3,22 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include <../headers/GenericVector.h>
+#include "GenericVector.h"
+
+
+
+
 
 class Hash {
 private:
 
-	static const int tableSize = N/4;
+	//static const int tableSize = N/4;
 	struct item {
-		GenericVector <int> vec(DIMENSION);
+		GenericVector <int> vec;
 		item* next;
 	};
 
-	item* HashTable[tableSize];
+	//item* HashTable[tableSize];
 
 public:
 	//constructor

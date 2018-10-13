@@ -1,8 +1,11 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include <../headers/hash.cpp>
+#include "../headers/hash.h"
 
 using namespace std;
 
-int Hash::Hash()
+Hash::Hash()
+{
+
+}
