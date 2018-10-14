@@ -3,6 +3,7 @@
 #include<string>
 #include<string.h>
 #include<fstream>
+#include<math.h>
 #include "../headers/LSH.h"
 #include "../headers/GenericVector.h"
 
@@ -12,13 +13,13 @@ using namespace std;
 
 LSH::LSH(int k, int L, string inputFile, string outputFile)
 {
+	/*initialize parameters*/
 	_k = k;
 	_L = L;
 	_inputFile = inputFile;
 	_outputFile = outputFile;
 	_arrayOfHashTables = new Hash*[_L]; //create array of pointers to hashtables
-
-
+	_hashTableSize = pow(2,_k);
 }
 
 void initParameters(int* k, int* L, std::string &input_file, std::string & output_file, std::string & query_file,int argc, char** argv)

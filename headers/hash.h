@@ -18,7 +18,8 @@ private:
 		item* next;
 	};
 
-	//item* HashTable[tableSize];
+	item** HashTable;
+	int hashTableSize; //hashTableSize = 2^k
 
 public:
 	//constructor
@@ -27,3 +28,4 @@ public:
 
 
 };
+
