@@ -4,33 +4,59 @@
 #include <string>
 #include <sstream>
 #include <cmath>
-#include "../headers/GenericVector.h"
 #include "../headers/LSH.h"
+#include "../headers/hash.h"
 
 
 using namespace std;
 
 int main(int argc, char **argv) {
-	GenericVector <int> vec(DIMENSION);
+	vector_t vec;
 	string line;
 	ifstream inputFile("src/input_small", ios::in);
 
 	int k,L;
 	string input_file, output_file, query_file;
 
+	/*initialize parameters*/
 	initParameters(&k, &L, input_file, output_file, query_file, argc, argv);
-	cout << k << endl;
-	cout << L << endl;
-	cout << output_file << endl;
+
+	/*create an LSH object*/
+	LSH lshObject(k, L, input_file, output_file, query_file);
+
+	int w = 4;
+	vector<int> p;
+	int i = 1;
+	p.reserve(4);
+	p.push_back(i);
+	p.push_back(i);
+	p.push_back(i);
+	p.push_back(i);
+
+	vector<int> v;
+	v.reserve(4);
+	v.push_back(1);
+	v.push_back(0);
+	v.push_back(0);
+	v.push_back(1);
+
+	int j = 0;
+	int sum = 0;
+	for(;j < (int)v.size(); j++){
+		sum = sum + v[j]*p[j];
+	}
+
+	int h = (sum+3)/w;
+	cout << "H is: " << h << endl;
 
 
 	int value;
-	int i=0;
+	i=0;
 	if (inputFile) {
 		while( inputFile >> value) {
 			printf("%d ", value);
 			if (i < DIMENSION - 1){
-				vec[i] = value;
+				vec.push_back(i);
 				i++;
 			}
 			else{
