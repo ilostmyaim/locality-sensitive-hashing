@@ -23,9 +23,14 @@ LSH::LSH(int k, int L, string inputFile, string outputFile, string queryFile)
 	_hashTableSize = pow(2,_k);
 }
 
-void LSH::executeLSH(metric)
+void LSH::executeLSH(Metric metric)
 {
-
+	if(metric == euclidean){
+		//do stuff
+	}
+	else if(metric == cosine){
+		//do stuff
+	}
 }
 
 void initParameters(int* k, int* L, std::string &input_file, std::string & output_file, std::string & query_file,int argc, char** argv)

@@ -3,7 +3,7 @@
 #include<string>
 #include "../headers/hash.h"
 
-enum metric { euclidean , cosine };
+enum Metric { euclidean , cosine };
 
 class LSH {
 
@@ -26,7 +26,7 @@ public:
 	int get_L();
 	std::string get_inputFile();
 	std::string get_outputFile();
-	void executeLSH(metric);
+	void executeLSH(Metric);
 
 };
 

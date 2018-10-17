@@ -7,6 +7,8 @@
 
 
 const int DIMENSION(128);
+const int radius = 250;
+const int neighbours = 2;
 typedef std::vector<double> vector_t;
 
 
