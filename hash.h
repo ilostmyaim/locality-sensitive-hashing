@@ -28,6 +28,7 @@ public:
 	//constructor
 	Hash(int V);
 	void insertItem(item_t item,unsigned int hashValue);
+	void displayHash();
 	int getTableSize();
 
 };

@@ -27,6 +27,17 @@ void Hash::insertItem(item_t item,unsigned int hashValue)
 	_hashTable[hashValue].push_back(item);
 }
 
+void Hash::displayHash()
+{
+	for(int i = 0;i<this->_tableSize;i++){
+		cout << "Bucket["<<i<<"]"<<endl;
+		for(auto x: _hashTable[i]){
+			cout << " --> " << x.id;
+		}
+		cout << endl;
+	}
+}
+
 int Hash::getTableSize()
 {
 	return this->_tableSize;
@@ -52,10 +63,6 @@ double inner_product(vector_t u, vector_t v)
 		sum = sum + u[i]*v[i];
 	}
 
-	cout << "vector u" << endl;
-	print_vector(u);
-	cout << "vector v" << endl;
-	print_vector(v);
 	return sum;
 }
 
@@ -82,9 +89,8 @@ L2_Hash::L2_Hash(int w)
 int L2_Hash::hash(vector_t p)
 {
 	int value = 0;
-	cout << "hashing" << endl;
 	value = (int)((inner_product(p, this->_v) + _t) / _w);
-	cout << "hi : " << value << endl;
+	//cout << "hi : " << value << endl;
 	return value;
 }
 
@@ -100,7 +106,6 @@ void L2_Hash::random_vector()
 		num = abs(distribution(generator));
 		vec_1.push_back(num);
 	}
-	cout << "random vector" << endl;
 	this->_v.clear();
 	//print_vector(vec);
 	this->_v = vec_1;

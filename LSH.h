@@ -30,6 +30,7 @@ public:
 	std::string get_outputFile();
 	int hash(int ,int);
 	void executeLSH(Metric);
+	void displayLSH();
 	void insertLSH(item_t item,unsigned int hashValue, int l);
 
 };

@@ -63,7 +63,7 @@ void LSH::executeLSH(Metric metric)
 					else{//create hi hash functions and concatenate to create g
 						for(j_k=0;j_k < _k;j_k++){
 							hash_string = to_string(l2_hash.hash(vec));
-							cout << "Hash string : " << hash_string<< endl;
+							//cout << "Hash string : " << hash_string<< endl;
 							hash_value.append(hash_string);
 							l2_hash.random_vector();
 							hash_string.clear();
@@ -71,10 +71,11 @@ void LSH::executeLSH(Metric metric)
 						item.vec = vec;
 						vec_id++;
 						item.id = vec_id;
-						cout << hash_value << endl;
+						//cout << "VEC_ID = " << vec_id << endl; 
+						//cout << hash_value << endl;
 						actualHashValue= (stol(hash_value) % M) %_hashTableSize;
 						hash_value.clear();
-						cout << "Actual hashvalue " << actualHashValue << endl;
+						//cout << "Actual hashvalue " << actualHashValue << endl;
 						_arrayOfHashTables[i_l]->insertItem(item,actualHashValue);
 						//clear vec and hash_value string
 						vec.clear();
@@ -86,6 +87,11 @@ void LSH::executeLSH(Metric metric)
 				
 	
 			}
+			//reinitialize vec_id to zero
+			vec_id = 0;
+			//clear inputFile and start reading again from the beginning
+			inputFile.clear();
+			inputFile.seekg(0,ios::beg);
 			if(inputFile.bad()){
 				perror("error");
 			}
@@ -93,6 +99,7 @@ void LSH::executeLSH(Metric metric)
 		
 
 		}
+		cout << "finished" << endl;
 	}
 	else if(metric == cosine){
 		//do stuff
@@ -100,11 +107,16 @@ void LSH::executeLSH(Metric metric)
 }
 
 
-void LSH::insertLSH(item_t item,unsigned int hashValue, int l)
+void LSH::displayLSH()
 {
-	
-}
+	cout << "display lsh" << endl;
+	for(int i = 0;i<this->_L;i++){
+		
+		cout << "Printing hashtable["<<i<<"]"<<endl;
+		_arrayOfHashTables[i]->displayHash();
 
+	}
+}
 void initParameters(int* k, int* L, std::string &input_file, std::string & output_file, std::string & query_file,int argc, char** argv)
 {
 	int i;

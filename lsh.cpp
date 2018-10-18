@@ -24,6 +24,8 @@ int main(int argc, char **argv) {
 	LSH lshObject(k, L, input_file, output_file, query_file);
 	Metric metric = euclidean;
 	lshObject.executeLSH(metric);
+	cout << "here" << endl;
+	lshObject.displayLSH();
 
 
 
