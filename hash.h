@@ -9,7 +9,7 @@
 
 
 const int DIMENSION(128);
-const int radius = 250;
+
 const int neighbours = 2;
 
 typedef std::vector<double> vector_t;
@@ -30,6 +30,7 @@ public:
 	void insertItem(item_t item,unsigned int hashValue);
 	void displayHash();
 	int getTableSize();
+	void traverseBucket(vector_t, unsigned int, int,int  );
 
 };
 

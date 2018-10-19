@@ -27,6 +27,21 @@ void Hash::insertItem(item_t item,unsigned int hashValue)
 	_hashTable[hashValue].push_back(item);
 }
 
+/*range search*/
+void Hash::traverseBucket(vector_t q, unsigned int hashValue,int R, int C=1)
+{
+	double distance = 0;
+	for(auto x: _hashTable[hashValue]){
+		/*calculate Eucledian deistance*/
+		distance = Euclidean_norm(q,x.vec);
+		if( distance < C*R){
+			cout << "distance: " << distance << endl;
+			print_vector(x.vec);
+		}
+		
+	}
+}
+
 void Hash::displayHash()
 {
 	for(int i = 0;i<this->_tableSize;i++){
@@ -51,6 +66,7 @@ double Euclidean_norm(vector_t u, vector_t v)
 	for(i = 0; i < (int)v.size(); i++){
 		sum = sum + pow(u[i]-v[i],2);
 	}
+	//cout << "sqrt(sum) = " << sqrt(sum) << endl;
 	return sqrt(sum);
 }
 
@@ -116,6 +132,7 @@ double L2_Hash::random_offset()
 {
 	uniform_int_distribution<int> distribution(0,_w);
 	this->_t = distribution(generator);
+	//cout << "T = " << this->_t << endl;
 }
 
 void print_vector(vector_t v)

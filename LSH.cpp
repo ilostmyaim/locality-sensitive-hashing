@@ -33,18 +33,21 @@ void LSH::executeLSH(Metric metric)
 {
 	if(metric == euclidean){
 		//do stuff
-		int i_l,j_k,i_vec=0; //counter for L and k respectively
-		int w = 4;
+		int i_l,j_k,i_vec=0,R; //counter for L and k respectively
+		string tmp; //for query file
 		string line;
-		double pValue=0; //read values from input file here
+		int C=1;
+		double pValue=0,qValue=0; //read values from input file and query file here
 		vector<double> vec; //store p_values to vec while reading
 		ifstream inputFile(_inputFile);// input file stream
+		ifstream queryFile(_queryFile);
 		string hash_string;
 		L2_Hash l2_hash(w);
 		string hash_value;
 		long double actualHashValue=0; 
 		static unsigned int vec_id = 0; // id for each vector readen
 		item_t item;
+
 
 		
 
@@ -66,6 +69,7 @@ void LSH::executeLSH(Metric metric)
 							//cout << "Hash string : " << hash_string<< endl;
 							hash_value.append(hash_string);
 							l2_hash.random_vector();
+							l2_hash.random_offset();
 							hash_string.clear();
 						}
 						item.vec = vec;
@@ -94,11 +98,44 @@ void LSH::executeLSH(Metric metric)
 			inputFile.seekg(0,ios::beg);
 			if(inputFile.bad()){
 				perror("error");
-			}
-			
+			}		
 		
 
+		}// after filling the hashtables start the query
+
+	
+		/*first read R from query file */
+		if(queryFile.is_open()){ 
+			i_vec = 0;
+			vec.clear();
+			queryFile >> tmp >> R;
+			cout << "Radius is: " << R << endl;
+			if(R == 0){ // find nearest neighbor
+				
+			}
+			else {
+				cout << "Range Search"<< endl;
+				/*********Range Search***********/
+				while(queryFile >> pValue) {
+					if(i_vec < DIMENSION){
+						//cout << pValue << " ";
+						vec.push_back(qValue);
+						i_vec++;
+					}
+					else{
+						cout << endl;
+						//print_vector(vec);
+						rangeSearch(vec,R,C);
+						vec.clear();
+						i_vec=0;
+					}
+				}
+
+			}
 		}
+		
+
+
 		cout << "finished" << endl;
 	}
 	else if(metric == cosine){
@@ -117,6 +154,34 @@ void LSH::displayLSH()
 
 	}
 }
+
+
+void LSH::rangeSearch(vector_t q, int R, int C=1)
+{
+	int i_l,j_k;
+	string hash_string;
+	string hash_value;
+	L2_Hash l2_hash(w);
+	static unsigned int q_id = 0;
+	long double actualHashValue=0; 
+	for(i_l = 0; i_l < _L; i_l++){
+		for(j_k=0;j_k < _k;j_k++){
+			hash_string = to_string(l2_hash.hash(q));
+			//cout << "Hash string : " << hash_string<< endl;
+			hash_value.append(hash_string);
+			l2_hash.random_vector();
+			l2_hash.random_offset();
+			hash_string.clear();
+		}
+		actualHashValue= (stol(hash_value) % M) %_hashTableSize;
+		//cout << "Inside range search "<< endl;
+		//cout << "ActualHashValue: " << actualHashValue << endl;
+		_arrayOfHashTables[i_l]->traverseBucket(q, actualHashValue, R, C);
+
+		hash_value.clear();
+	}
+}
+
 void initParameters(int* k, int* L, std::string &input_file, std::string & output_file, std::string & query_file,int argc, char** argv)
 {
 	int i;

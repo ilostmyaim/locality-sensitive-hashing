@@ -7,6 +7,7 @@
 enum Metric { euclidean , cosine };
 
 #define M 60000000000
+const int w = 4;
 class LSH {
 
 private:
@@ -32,6 +33,7 @@ public:
 	void executeLSH(Metric);
 	void displayLSH();
 	void insertLSH(item_t item,unsigned int hashValue, int l);
+	void rangeSearch(vector_t q,int R, int C);
 
 };
 

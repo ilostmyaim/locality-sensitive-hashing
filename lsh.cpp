@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 	Metric metric = euclidean;
 	lshObject.executeLSH(metric);
 	cout << "here" << endl;
-	lshObject.displayLSH();
+	//lshObject.displayLSH();
 
 
 
