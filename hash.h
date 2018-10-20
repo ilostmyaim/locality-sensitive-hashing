@@ -31,6 +31,7 @@ public:
 	void displayHash();
 	int getTableSize();
 	void traverseBucket(vector_t, unsigned int, int,int  );
+	void nearestNeighborTraverse(vector_t q, unsigned int hashValue);
 
 };
 

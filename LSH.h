@@ -34,6 +34,7 @@ public:
 	void displayLSH();
 	void insertLSH(item_t item,unsigned int hashValue, int l);
 	void rangeSearch(vector_t q,int R, int C);
+	void nearestNeighbor(vector_t);
 
 };
 

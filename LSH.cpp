@@ -46,12 +46,8 @@ void LSH::executeLSH(Metric metric)
 		string hash_value;
 		long double actualHashValue=0; 
 		static unsigned int vec_id = 0; // id for each vector readen
+		static unsigned int q_id = 0;
 		item_t item;
-
-
-		
-
-		cout << "Im innnnn"<< endl;
 		
 
 		for(i_l=0;i_l<_L;i_l++){
@@ -111,7 +107,22 @@ void LSH::executeLSH(Metric metric)
 			queryFile >> tmp >> R;
 			cout << "Radius is: " << R << endl;
 			if(R == 0){ // find nearest neighbor
-				
+				/*********** Nearest neighbor*********/
+				cout << "Nearest Neighbor" << endl;
+				while(queryFile >> pValue) {
+					if(i_vec < DIMENSION) {
+						vec.push_back(qValue);
+						i_vec++;
+					}
+					else{
+						cout << endl;
+						cout << "Query: " << q_id << endl;
+						q_id++;
+						nearestNeighbor(vec);
+						vec.clear();
+						i_vec=0;
+					}
+				}
 			}
 			else {
 				cout << "Range Search"<< endl;
@@ -125,12 +136,13 @@ void LSH::executeLSH(Metric metric)
 					else{
 						cout << endl;
 						//print_vector(vec);
+						cout << "Query: " << q_id << endl;
+						q_id++;
 						rangeSearch(vec,R,C);
 						vec.clear();
 						i_vec=0;
 					}
 				}
-
 			}
 		}
 		
@@ -176,7 +188,35 @@ void LSH::rangeSearch(vector_t q, int R, int C=1)
 		actualHashValue= (stol(hash_value) % M) %_hashTableSize;
 		//cout << "Inside range search "<< endl;
 		//cout << "ActualHashValue: " << actualHashValue << endl;
+		cout << "Hashtable["<<i_l<<"]" << endl;
 		_arrayOfHashTables[i_l]->traverseBucket(q, actualHashValue, R, C);
+
+		hash_value.clear();
+	}
+}
+
+void LSH::nearestNeighbor(vector_t q)
+{
+	int i_l,j_k;
+	string hash_string;
+	string hash_value;
+	L2_Hash l2_hash(w);
+	static unsigned int q_id = 0;
+	long double actualHashValue=0; 
+	for(i_l = 0; i_l < _L; i_l++){
+		for(j_k=0;j_k < _k;j_k++){
+			hash_string = to_string(l2_hash.hash(q));
+			//cout << "Hash string : " << hash_string<< endl;
+			hash_value.append(hash_string);
+			l2_hash.random_vector();
+			l2_hash.random_offset();
+			hash_string.clear();
+		}
+		actualHashValue= (stol(hash_value) % M) %_hashTableSize;
+		//cout << "Inside range search "<< endl;
+		//cout << "ActualHashValue: " << actualHashValue << endl;
+		cout << "Hashtable["<<i_l<<"]" << endl;
+		_arrayOfHashTables[i_l]->nearestNeighborTraverse(q, actualHashValue);
 
 		hash_value.clear();
 	}

@@ -31,15 +31,32 @@ void Hash::insertItem(item_t item,unsigned int hashValue)
 void Hash::traverseBucket(vector_t q, unsigned int hashValue,int R, int C=1)
 {
 	double distance = 0;
+	cout << "Range Search in Bucket["<<hashValue<<"]"<<endl;
 	for(auto x: _hashTable[hashValue]){
 		/*calculate Eucledian deistance*/
 		distance = Euclidean_norm(q,x.vec);
-		if( distance < C*R){
+		if( distance < C*R && distance > (C*R)-50){
 			cout << "distance: " << distance << endl;
 			print_vector(x.vec);
-		}
-		
+		}	
 	}
+}
+/*Nearest Neighbor serach*/
+void Hash::nearestNeighborTraverse(vector_t q, unsigned int hashValue)
+{
+	double distance = 0;
+	double min_distance = 1000000;
+	vector_t nearest_vec;
+	cout << "NN-Search in Bucket["<<hashValue<<"]"<<endl;
+	for(auto x: _hashTable[hashValue]){
+		/*calculate Eucledian deistance*/
+		distance = Euclidean_norm(q,x.vec);
+		if( distance <= min_distance){
+			min_distance = distance;
+			nearest_vec = x.vec;
+		}	
+	}
+	print_vector(nearest_vec);
 }
 
 void Hash::displayHash()
