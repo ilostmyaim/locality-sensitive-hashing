@@ -31,13 +31,14 @@ public:
 	void displayHash();
 	int getTableSize();
 	void traverseBucket(vector_t, unsigned int, int,int  );
-	void nearestNeighborTraverse(vector_t q, unsigned int hashValue);
+	void nearestNeighborTraverse(vector_t q, unsigned int hashValue, int L);
 
 };
 
 
-double  Euclidean_norm(vector_t u, vector_t v);
-double inner_product(vector_t u, vector_t v);
+double  euclideanNorm(vector_t u, vector_t v);
+double cosineSimilarity(vector_t x, vector_t y);
+double innerProduct(vector_t u, vector_t v);
 void print_vector(vector_t v);
 
 

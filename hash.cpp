@@ -34,7 +34,7 @@ void Hash::traverseBucket(vector_t q, unsigned int hashValue,int R, int C=1)
 	cout << "Range Search in Bucket["<<hashValue<<"]"<<endl;
 	for(auto x: _hashTable[hashValue]){
 		/*calculate Eucledian deistance*/
-		distance = Euclidean_norm(q,x.vec);
+		distance = euclideanNorm(q,x.vec);
 		if( distance < C*R && distance > (C*R)-50){
 			cout << "distance: " << distance << endl;
 			print_vector(x.vec);
@@ -42,20 +42,30 @@ void Hash::traverseBucket(vector_t q, unsigned int hashValue,int R, int C=1)
 	}
 }
 /*Nearest Neighbor serach*/
-void Hash::nearestNeighborTraverse(vector_t q, unsigned int hashValue)
+void Hash::nearestNeighborTraverse(vector_t q, unsigned int hashValue, int L)
 {
 	double distance = 0;
 	double min_distance = 1000000;
+	int count_retrieved = 0;
+	int nearest_id = 0;
 	vector_t nearest_vec;
 	cout << "NN-Search in Bucket["<<hashValue<<"]"<<endl;
 	for(auto x: _hashTable[hashValue]){
 		/*calculate Eucledian deistance*/
-		distance = Euclidean_norm(q,x.vec);
+		distance = euclideanNorm(q,x.vec);
+		count_retrieved++;
+		if(count_retrieved > 3*L){
+			cout << "Approximate NN: " << x.id << endl; 
+			print_vector(x.vec);
+			break;
+		}
 		if( distance <= min_distance){
 			min_distance = distance;
+			nearest_id = x.id;
 			nearest_vec = x.vec;
 		}	
 	}
+	cout << "Nearest neighbor is: " << nearest_id << endl;
 	print_vector(nearest_vec);
 }
 
@@ -76,7 +86,7 @@ int Hash::getTableSize()
 }
 
 
-double Euclidean_norm(vector_t u, vector_t v)
+double euclideanNorm(vector_t u, vector_t v)
 {
 	int i;
 	int sum = 0;
@@ -87,7 +97,18 @@ double Euclidean_norm(vector_t u, vector_t v)
 	return sqrt(sum);
 }
 
-double inner_product(vector_t u, vector_t v)
+double cosineSimilarity(vector_t x, vector_t y)
+{
+	double dot = 0, denom_x = 0, denom_y = 0;
+	dot = innerProduct(x, y);
+	denom_x = innerProduct(x, x);
+	denom_y = innerProduct(y, y);
+
+	return ( dot / (sqrt(denom_x) * sqrt(denom_y)) );
+
+}
+
+double innerProduct(vector_t u, vector_t v)
 {
 	int i;
 	double sum = 0;
@@ -122,7 +143,7 @@ L2_Hash::L2_Hash(int w)
 int L2_Hash::hash(vector_t p)
 {
 	int value = 0;
-	value = (int)((inner_product(p, this->_v) + _t) / _w);
+	value = (int)((innerProduct(p, this->_v) + _t) / _w);
 	//cout << "hi : " << value << endl;
 	return value;
 }

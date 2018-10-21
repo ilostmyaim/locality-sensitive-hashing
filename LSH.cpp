@@ -216,7 +216,7 @@ void LSH::nearestNeighbor(vector_t q)
 		//cout << "Inside range search "<< endl;
 		//cout << "ActualHashValue: " << actualHashValue << endl;
 		cout << "Hashtable["<<i_l<<"]" << endl;
-		_arrayOfHashTables[i_l]->nearestNeighborTraverse(q, actualHashValue);
+		_arrayOfHashTables[i_l]->nearestNeighborTraverse(q, actualHashValue, this->_L);
 
 		hash_value.clear();
 	}
