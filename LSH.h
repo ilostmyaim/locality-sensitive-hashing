@@ -2,11 +2,16 @@
 
 #include<string>
 #include<vector>
-#include "hash.h"
 
-enum Metric { euclidean , cosine };
 
-#define M 60000000000
+class Hash;
+typedef struct item item_t;
+typedef std::vector<double> vector_t;
+
+enum Metric { euclidean , cosine } ;
+
+
+#define M 60000
 const int w = 4;
 class LSH {
 
@@ -24,7 +29,7 @@ private:
 
 public:
 
-	LSH(int k=4, int L=5, std::string inputFile = "input_file", std::string outputFile="output_file", std::string queryFile="query_file"); //constructor
+	LSH(int k=4, int L=5, std::string inputFile = "input_file", std::string outputFile="output_file", std::string queryFile="query_file", Metric metric = euclidean); //constructor
 	int get_k();
 	int get_L();
 	std::string get_inputFile();
@@ -33,8 +38,8 @@ public:
 	void executeLSH(Metric);
 	void displayLSH();
 	void insertLSH(item_t item,unsigned int hashValue, int l);
-	void rangeSearch(vector_t q,int R, int C);
-	void nearestNeighbor(vector_t);
+	void rangeSearch(vector_t q,int R, int C, Metric metric);
+	void nearestNeighbor(vector_t, Metric metric);
 
 };
 

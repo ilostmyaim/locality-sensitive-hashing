@@ -7,6 +7,7 @@
 #include <random>
 #include <list>
 
+enum Metric;
 
 const int DIMENSION(128);
 
@@ -22,16 +23,25 @@ typedef struct item{
 class Hash {
 private:
 	int _tableSize;
+	int _w; //default value is 4
+	vector_t vec_t; //keep offset t here
+	std::vector<vector_t > vec_v; //keep random vectors here(v for euclidean , ri for cosine)
 	std::list<item_t> *_hashTable;
 	
 public:
 	//constructor
-	Hash(int V);
+	Hash(int b, int );
 	void insertItem(item_t item,unsigned int hashValue);
 	void displayHash();
 	int getTableSize();
-	void traverseBucket(vector_t, unsigned int, int,int  );
-	void nearestNeighborTraverse(vector_t q, unsigned int hashValue, int L);
+	void traverseBucket(vector_t, long int, int,int ,Metric metric);
+	void nearestNeighborTraverse(vector_t q, long int hashValue, int L ,Metric metric);
+
+	long int hash(vector_t p);
+	long int cosineHash(vector_t p);
+	vector_t random_vector();
+	double random_offset();
+	std::string combine();
 
 };
 
@@ -42,16 +52,3 @@ double innerProduct(vector_t u, vector_t v);
 void print_vector(vector_t v);
 
 
-class L2_Hash{
-private:
-	vector_t _v;
-	int _t; //offset
-	int _w; //default value is 4
-public:
-	L2_Hash(int w);
-	int hash(vector_t p);
-	void random_vector();
-	double random_offset();
-	std::string combine();
-
-};

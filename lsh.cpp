@@ -21,10 +21,10 @@ int main(int argc, char **argv) {
 	initParameters(&k, &L, input_file, output_file, query_file, argc, argv);
 
 	/*create an LSH object*/
-	LSH lshObject(k, L, input_file, output_file, query_file);
-	Metric metric = euclidean;
+	Metric metric = cosine;
+	LSH lshObject(k, L, input_file, output_file, query_file,metric);
 	lshObject.executeLSH(metric);
-	//lshObject.displayLSH();
+	lshObject.displayLSH();
 
 
 

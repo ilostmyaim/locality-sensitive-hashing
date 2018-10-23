@@ -6,8 +6,9 @@
 #include <random>
 #include <list>
 #include <ctime>
-#include "hash.h"
 #include "LSH.h"
+#include "hash.h"
+
 
 using namespace std;
 
@@ -16,10 +17,18 @@ using std::default_random_engine;
 int seed = time(0);
 default_random_engine generator(seed);
 
-Hash::Hash(int b)
+Hash::Hash(int b,int k)
 {
 	this->_tableSize = b;
+	//cout << "Hashtable size is: " << _tableSize << endl;
+	this->_w = 200; 
+	for(int i = 0;i<k;i++){
+		this->vec_t.push_back(random_offset());
+		this->vec_v.push_back(random_vector());
+	}
+
 	_hashTable = new list<item_t>[_tableSize];
+
 }
 
 void Hash::insertItem(item_t item,unsigned int hashValue)
@@ -28,41 +37,65 @@ void Hash::insertItem(item_t item,unsigned int hashValue)
 }
 
 /*range search*/
-void Hash::traverseBucket(vector_t q, unsigned int hashValue,int R, int C=1)
+void Hash::traverseBucket(vector_t q, long int hashValue,int R, int C=1,Metric metric=euclidean)
 {
 	double distance = 0;
 	cout << "Range Search in Bucket["<<hashValue<<"]"<<endl;
 	for(auto x: _hashTable[hashValue]){
 		/*calculate Eucledian deistance*/
-		distance = euclideanNorm(q,x.vec);
-		if( distance < C*R && distance > (C*R)-50){
-			cout << "distance: " << distance << endl;
+		if(metric == euclidean) { 
+			distance = euclideanNorm(q,x.vec);
+			if( distance < C*R){
+				cout << "distance: " << distance << endl;
+				print_vector(x.vec);
+			}
+		}
+		else if(metric == cosine) {
+			distance = cosineSimilarity(q,x.vec);
+			cout << "cosine distance: " << distance << endl;
 			print_vector(x.vec);
 		}	
 	}
 }
 /*Nearest Neighbor serach*/
-void Hash::nearestNeighborTraverse(vector_t q, unsigned int hashValue, int L)
+void Hash::nearestNeighborTraverse(vector_t q, long int hashValue, int L, Metric metric)
 {
 	double distance = 0;
 	double min_distance = 1000000;
 	int count_retrieved = 0;
 	int nearest_id = 0;
 	vector_t nearest_vec;
-	cout << "NN-Search in Bucket["<<hashValue<<"]"<<endl;
+	//cout << "NN-Search in Bucket["<<hashValue<<"]"<<endl;
 	for(auto x: _hashTable[hashValue]){
 		/*calculate Eucledian deistance*/
-		distance = euclideanNorm(q,x.vec);
-		count_retrieved++;
-		if(count_retrieved > 3*L){
-			cout << "Approximate NN: " << x.id << endl; 
-			print_vector(x.vec);
-			break;
+		if(metric == euclidean){ 
+			distance = euclideanNorm(q,x.vec);
+			count_retrieved++;
+			if(count_retrieved > 3*L){
+				cout << "Approximate NN: " << x.id << endl; 
+				print_vector(x.vec);
+				break;
+			}
+			if( distance <= min_distance){
+				min_distance = distance;
+				nearest_id = x.id;
+				nearest_vec = x.vec;
+			}
 		}
-		if( distance <= min_distance){
-			min_distance = distance;
-			nearest_id = x.id;
-			nearest_vec = x.vec;
+		else if (metric == cosine){
+			min_distance = -1;
+			distance = cosineSimilarity(q, x.vec);
+			count_retrieved++;
+			if(count_retrieved > 3*L){
+				cout << "Approximate NN: " << x.id << endl; 
+				print_vector(x.vec);
+				break;
+			}
+			if( distance >= min_distance){
+				min_distance = distance;
+				nearest_id = x.id;
+				nearest_vec = x.vec;
+			}
 		}	
 	}
 	cout << "Nearest neighbor is: " << nearest_id << endl;
@@ -122,34 +155,43 @@ double innerProduct(vector_t u, vector_t v)
 
 
 
-L2_Hash::L2_Hash(int w)
-{
-	normal_distribution<double> distribution(0.0, 1.0);
 
-	
-	int i;
-	double num = 0;
-	for(i=0; i< DIMENSION; i++){
-		num = abs(distribution(generator));
-		_v.push_back(num);
+long int Hash::hash(vector_t p)
+{
+	long int value = 0;
+	long int sum = 0;
+	uniform_int_distribution<int> distribution(0,200);//initialize for R value
+	for(int i=0;i<(int)this->vec_v.size();i++){ 
+		value = ((innerProduct(p, this->vec_v[i]) + vec_t[i]) / _w);
+		//sum of hi functions to create f
+		sum+= (distribution(generator) * value);
 	}
-
-	
-	uniform_int_distribution<int> distribution_2(0,_w);
-	_t = distribution_2(generator);
-	_w = w;
+	//cout << "Sum is: " << sum << endl;
+	return sum;
 }
 
-int L2_Hash::hash(vector_t p)
+long int Hash::cosineHash(vector_t p)
 {
-	int value = 0;
-	value = (int)((innerProduct(p, this->_v) + _t) / _w);
-	//cout << "hi : " << value << endl;
-	return value;
+	long int value = 0;
+	string hi;
+	long int hash_value = 0;
+	for(int i = 0; i<(int)this->vec_v.size();i++){
+		value = ((innerProduct(p, this->vec_v[i])));
+		if(value >= 0){
+			hi.append("1");
+		}
+		else{
+			hi.append("0");
+		}
+	}
+	//cout << "hi: " << hi << endl;
+	hash_value = stol(hi, nullptr, 2);
+	//cout << "Cosine hash value is:" << hash_value << endl;
+	return hash_value ;
+
 }
 
-
-void L2_Hash::random_vector()
+vector_t Hash::random_vector()
 {
 	normal_distribution<double> distribution(0.0, 1.0);
 
@@ -157,26 +199,26 @@ void L2_Hash::random_vector()
 	int i;
 	double num = 0;
 	for(i=0; i< DIMENSION; i++){
-		num = abs(distribution(generator));
+		num = distribution(generator);
 		vec_1.push_back(num);
 	}
-	this->_v.clear();
-	//print_vector(vec);
-	this->_v = vec_1;
-	vec_1.clear();
+	
+	return vec_1;
 }
 
-double L2_Hash::random_offset()
+double Hash::random_offset()
 {
 	uniform_int_distribution<int> distribution(0,_w);
-	this->_t = distribution(generator);
+	double t;
+	t = distribution(generator);
+	return t;
 	//cout << "T = " << this->_t << endl;
 }
 
 void print_vector(vector_t v)
 {
 	cout << "vector: ";
-	for(int i = 0;i<v.size();i++){
+	for(int i = 0;i<(int)v.size();i++){
 		cout << v[i] << " ";
 	}
 	cout << endl;
