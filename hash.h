@@ -34,7 +34,7 @@ public:
 	void insertItem(item_t item,unsigned int hashValue);
 	void displayHash();
 	int getTableSize();
-	void traverseBucket(vector_t, long int, int,int ,Metric metric);
+	void traverseBucket(vector_t, long int, double R,double C ,Metric metric);
 	void nearestNeighborTraverse(vector_t q, long int hashValue, int L ,Metric metric);
 
 	long int hash(vector_t p);

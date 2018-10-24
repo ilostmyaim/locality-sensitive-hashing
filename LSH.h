@@ -38,7 +38,7 @@ public:
 	void executeLSH(Metric);
 	void displayLSH();
 	void insertLSH(item_t item,unsigned int hashValue, int l);
-	void rangeSearch(vector_t q,int R, int C, Metric metric);
+	void rangeSearch(vector_t q,double R, double C, Metric metric);
 	void nearestNeighbor(vector_t, Metric metric);
 
 };

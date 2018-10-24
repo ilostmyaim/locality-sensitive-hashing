@@ -37,7 +37,7 @@ void Hash::insertItem(item_t item,unsigned int hashValue)
 }
 
 /*range search*/
-void Hash::traverseBucket(vector_t q, long int hashValue,int R, int C=1,Metric metric=euclidean)
+void Hash::traverseBucket(vector_t q, long int hashValue,double R, double C=1,Metric metric=euclidean)
 {
 	double distance = 0;
 	cout << "Range Search in Bucket["<<hashValue<<"]"<<endl;
@@ -52,8 +52,10 @@ void Hash::traverseBucket(vector_t q, long int hashValue,int R, int C=1,Metric m
 		}
 		else if(metric == cosine) {
 			distance = cosineSimilarity(q,x.vec);
-			cout << "cosine distance: " << distance << endl;
-			print_vector(x.vec);
+			if( distance < C * R){ 
+				cout << "cosine distance: " << distance << endl;
+				print_vector(x.vec);
+			}
 		}	
 	}
 }

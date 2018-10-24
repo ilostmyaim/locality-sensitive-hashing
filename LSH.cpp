@@ -47,7 +47,8 @@ LSH::LSH(int k, int L, string inputFile, string outputFile, string queryFile,Met
 void LSH::executeLSH(Metric metric)
 {
 	//do stuff
-	int i_l,j_k,i_vec=0,R; //counter for L and k respectively
+	int i_l,j_k,i_vec=0; //counter for L and k respectively
+	double R=0;
 	string tmp; //for query file
 	string line;
 	int C=1;
@@ -183,25 +184,25 @@ void LSH::executeLSH(Metric metric)
 					}
 				}
 			}
-//			else {
-//				cout << "Range Search"<< endl;
-//				/*********Range Search***********/
-//				while(queryFile >> pValue) {
-//					if(i_vec < DIMENSION){
-//						//cout << pValue << " ";
-//						vec.push_back(pValue);
-//						i_vec++;
-//					}
-//					else{
-//						cout << endl;
-//						cout << "Query: " << q_id << endl;
-//						q_id++;
-//						rangeSearch(vec,R,C,metric);
-//						vec.clear();
-//						i_vec=0;
-//					}
-//				}
-//			}
+			else {
+				cout << "Range Search"<< endl;
+				/*********Range Search***********/
+				while(queryFile >> pValue) {
+					if(i_vec < DIMENSION){
+						//cout << pValue << " ";
+						vec.push_back(pValue);
+						i_vec++;
+					}
+					else{
+						cout << endl;
+						cout << "Query: " << q_id << endl;
+						q_id++;
+						rangeSearch(vec,R,C,metric);
+						vec.clear();
+						i_vec=0;
+					}
+				}
+			}
 		}
 	}
 }
@@ -219,24 +220,39 @@ void LSH::displayLSH()
 }
 
 
-void LSH::rangeSearch(vector_t q, int R, int C=1, Metric metric = euclidean)
+void LSH::rangeSearch(vector_t q, double R, double C=1, Metric metric = euclidean)
 {
 	int i_l,j_k;
 	string hash_string;
 	long int hash_value;
 	static unsigned int q_id = 0;
 	long double actualHashValue=0; 
-	for(i_l = 0; i_l < _L; i_l++){
-		
-
-		hash_value = _arrayOfHashTables[i_l]->hash(q);
-		//cout << "hash_value = " << hash_value << endl;
-		actualHashValue = ((hash_value % M) + M) % _hashTableSize;
-		//cout << "actualHashValue = " << actualHashValue << endl;
-		//cout << "Inside range search "<< endl;
-		//cout << "ActualHashValue: " << actualHashValue << endl;
-		//cout << "Hashtable["<<i_l<<"]" << endl;
-		_arrayOfHashTables[i_l]->traverseBucket(q, actualHashValue, R, C , metric);
+	if(metric == euclidean){ 
+		for(i_l = 0; i_l < _L; i_l++){
+			
+	
+			hash_value = _arrayOfHashTables[i_l]->hash(q);
+			//cout << "hash_value = " << hash_value << endl;
+			actualHashValue = ((hash_value % M) + M) % _hashTableSize;
+			//cout << "actualHashValue = " << actualHashValue << endl;
+			//cout << "Inside range search "<< endl;
+			//cout << "ActualHashValue: " << actualHashValue << endl;
+			//cout << "Hashtable["<<i_l<<"]" << endl;
+			_arrayOfHashTables[i_l]->traverseBucket(q, actualHashValue, R, C , metric);
+		}
+	}
+	else{
+		for(i_l = 0; i_l < _L; i_l++){
+	
+			hash_value = _arrayOfHashTables[i_l]->cosineHash(q);
+			//cout << "hash_value = " << hash_value << endl;
+			actualHashValue = ((hash_value % M) + M) % _hashTableSize;
+			//cout << "actualHashValue = " << actualHashValue << endl;
+			//cout << "Inside range search "<< endl;
+			//cout << "ActualHashValue: " << actualHashValue << endl;
+			//cout << "Hashtable["<<i_l<<"]" << endl;
+			_arrayOfHashTables[i_l]->traverseBucket(q, actualHashValue, R, C , metric);
+		}
 	}
 }
 
@@ -247,13 +263,26 @@ void LSH::nearestNeighbor(vector_t q,Metric metric)
 	long int hash_value;
 	static unsigned int q_id = 0;
 	long double actualHashValue=0; 
-	for(i_l = 0; i_l < _L; i_l++){
-		hash_value = _arrayOfHashTables[i_l]->hash(q);
-		actualHashValue = ((hash_value % M) + M) % _hashTableSize;
-		//cout << "Inside range search "<< endl;
-		//cout << "ActualHashValue: " << actualHashValue << endl;
-		//cout << "Hashtable["<<i_l<<"]" << endl;
-		_arrayOfHashTables[i_l]->nearestNeighborTraverse(q, actualHashValue, this->_L,metric);
+	if(metric == euclidean){ 
+		for(i_l = 0; i_l < _L; i_l++){
+			hash_value = _arrayOfHashTables[i_l]->hash(q);
+			actualHashValue = ((hash_value % M) + M) % _hashTableSize;
+			//cout << "Inside range search "<< endl;
+			//cout << "ActualHashValue: " << actualHashValue << endl;
+			//cout << "Hashtable["<<i_l<<"]" << endl;
+			_arrayOfHashTables[i_l]->nearestNeighborTraverse(q, actualHashValue, this->_L,metric);
+		}
+	}
+	else{
+		for(i_l = 0; i_l < _L; i_l++){
+			hash_value = _arrayOfHashTables[i_l]->cosineHash(q);
+			actualHashValue = ((hash_value % M) + M) % _hashTableSize;
+			//cout << "Inside range search "<< endl;
+			//cout << "ActualHashValue: " << actualHashValue << endl;
+			//cout << "Hashtable["<<i_l<<"]" << endl;
+			_arrayOfHashTables[i_l]->nearestNeighborTraverse(q, actualHashValue, this->_L,metric);
+		}
+
 	}
 }
 
