@@ -188,7 +188,7 @@ long int Hash::cosineHash(vector_t p)
 	}
 	//cout << "hi: " << hi << endl;
 	hash_value = stol(hi, nullptr, 2);
-	//cout << "Cosine hash value is:" << hash_value << endl;
+	
 	return hash_value ;
 
 }

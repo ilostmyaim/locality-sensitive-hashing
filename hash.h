@@ -6,6 +6,7 @@
 #include <vector>
 #include <random>
 #include <list>
+#include "LSH.h"
 
 enum Metric;
 

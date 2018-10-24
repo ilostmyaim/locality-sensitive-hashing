@@ -34,10 +34,9 @@ public:
 	int get_L();
 	std::string get_inputFile();
 	std::string get_outputFile();
-	int hash(int ,int);
 	void executeLSH(Metric);
 	void displayLSH();
-	void insertLSH(item_t item,unsigned int hashValue, int l);
+	//void insertLSH(item_t item,unsigned int hashValue, int l);
 	void rangeSearch(vector_t q,double R, double C, Metric metric);
 	void nearestNeighbor(vector_t, Metric metric);
 

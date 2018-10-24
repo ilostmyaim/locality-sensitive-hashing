@@ -24,8 +24,6 @@ LSH::LSH(int k, int L, string inputFile, string outputFile, string queryFile,Met
 	_arrayOfHashTables = new Hash*[_L]; //create array of pointers to hashtables
 	ifstream inFile(_inputFile);
 	int count = 0;
-	double pValue=0;
-	int i_vec = 0;
 	string line;
 	if(metric == euclidean) {
 		if(inFile.is_open()) {
@@ -47,7 +45,7 @@ LSH::LSH(int k, int L, string inputFile, string outputFile, string queryFile,Met
 void LSH::executeLSH(Metric metric)
 {
 	//do stuff
-	int i_l,j_k,i_vec=0; //counter for L and k respectively
+	int i_l,i_vec=0; //counter for L and k respectively
 	double R=0;
 	string tmp; //for query file
 	string line;
@@ -79,12 +77,14 @@ void LSH::executeLSH(Metric metric)
 						//cout << "VEC_ID = " << vec_id << endl; 
 						if(metric == euclidean){
 							hash_value = _arrayOfHashTables[i_l]->hash(vec);
+							actualHashValue = ((hash_value % M) + M) % _hashTableSize;
 						}
 						else{
 							hash_value = _arrayOfHashTables[i_l]->cosineHash(vec);
+							actualHashValue = hash_value;
 						}
 
-						actualHashValue = ((hash_value % M) + M) % _hashTableSize;
+						
 						//cout << "Actual hashvalue " << actualHashValue << endl;
 						_arrayOfHashTables[i_l]->insertItem(item,actualHashValue);
 						//clear vec and hash_value string
@@ -222,10 +222,9 @@ void LSH::displayLSH()
 
 void LSH::rangeSearch(vector_t q, double R, double C=1, Metric metric = euclidean)
 {
-	int i_l,j_k;
+	int i_l;
 	string hash_string;
 	long int hash_value;
-	static unsigned int q_id = 0;
 	long double actualHashValue=0; 
 	if(metric == euclidean){ 
 		for(i_l = 0; i_l < _L; i_l++){
@@ -246,7 +245,7 @@ void LSH::rangeSearch(vector_t q, double R, double C=1, Metric metric = euclidea
 	
 			hash_value = _arrayOfHashTables[i_l]->cosineHash(q);
 			//cout << "hash_value = " << hash_value << endl;
-			actualHashValue = ((hash_value % M) + M) % _hashTableSize;
+			actualHashValue = hash_value;
 			//cout << "actualHashValue = " << actualHashValue << endl;
 			//cout << "Inside range search "<< endl;
 			//cout << "ActualHashValue: " << actualHashValue << endl;
@@ -258,10 +257,9 @@ void LSH::rangeSearch(vector_t q, double R, double C=1, Metric metric = euclidea
 
 void LSH::nearestNeighbor(vector_t q,Metric metric)
 {
-	int i_l,j_k;
+	int i_l;
 	string hash_string;
 	long int hash_value;
-	static unsigned int q_id = 0;
 	long double actualHashValue=0; 
 	if(metric == euclidean){ 
 		for(i_l = 0; i_l < _L; i_l++){
@@ -276,7 +274,7 @@ void LSH::nearestNeighbor(vector_t q,Metric metric)
 	else{
 		for(i_l = 0; i_l < _L; i_l++){
 			hash_value = _arrayOfHashTables[i_l]->cosineHash(q);
-			actualHashValue = ((hash_value % M) + M) % _hashTableSize;
+			actualHashValue = hash_value;
 			//cout << "Inside range search "<< endl;
 			//cout << "ActualHashValue: " << actualHashValue << endl;
 			//cout << "Hashtable["<<i_l<<"]" << endl;
@@ -289,32 +287,32 @@ void LSH::nearestNeighbor(vector_t q,Metric metric)
 void initParameters(int* k, int* L, std::string &input_file, std::string & output_file, std::string & query_file,int argc, char** argv)
 {
 	int i;
-	int k_flag = 0, L_flag = 1, input_flag = 1, output_flag = 1, query_flag = 1;
+	//int k_flag = 0, L_flag = 1, input_flag = 1, output_flag = 1, query_flag = 1;
 	for(i = 1; i<argc; i++){
 		if(strcmp(argv[i], "-o") == 0){
 			i++;
 			output_file = argv[i];
-			output_flag = 1;
+			//output_flag = 1;
 		}
 		else if(strcmp(argv[i],"-q") == 0){
 			i++;
 			query_file = argv[i];
-			query_flag = 1;
+			//query_flag = 1;
 		}
 		else if(strcmp(argv[i],"-d") == 0){
 			i++;
 			input_file = argv[i];
-			input_flag = 1;
+			//input_flag = 1;
 		}
 		else if(strcmp(argv[i],"-k") == 0){
 			i++;
 			*k=stoi(argv[i]);
-			k_flag = 1;
+			//k_flag = 1;
 		}
 		else if(strcmp(argv[i],"-L") == 0){
 			i++;
 			*L=stoi(argv[i]);
-			L_flag = 1;
+			//L_flag = 1;
 		}
 	}
 }
