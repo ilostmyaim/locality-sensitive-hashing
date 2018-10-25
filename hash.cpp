@@ -193,6 +193,52 @@ long int Hash::cosineHash(vector_t p)
 
 }
 
+long int Hash::hashCUBE(vector_t p)
+{
+	long int value = 0;
+	long int sum = 0;
+	string hi;
+	int one_zero = 0;
+	int found = 0;
+	uniform_int_distribution<int> distribution(0,200);//initialize for ri value
+	uniform_int_distribution<int> CUBEdistribution(0,1);
+	for(int i=0;i<(int)this->vec_v.size();i++){
+		found = 0;
+		value = ((innerProduct(p, this->vec_v[i]) + vec_t[i]) / _w);
+		for(int j=0;j<this->value_vec.size();j++){
+			if(value == this->value_vec[j]){ //if value already exists in value_vec
+				//proceed and append the appropriate one or zero to hi string
+				found = 1;
+				one_zero = this->one_zero_vec[j];
+				if(one_zero == 0){
+					hi.append("0");
+				}
+				else{
+					hi.append("1");
+				}
+				break;// exit search in value_vec
+			}
+		}	
+		if(found == 0){// if value doesn't exist in value_vec,then add value to value_vec
+			this->value_vec.push_back(value);
+			one_zero = CUBEdistribution(generator); //coin tosh
+			this->one_zero_vec.push_back(one_zero);//add one_zero to one_zero_vec
+			if(one_zero == 0){
+				hi.append("0");
+			}
+			else{
+				hi.append("1");
+			}
+		}
+		//sum of hi functions to create f
+		//sum+= (distribution(generator) * value);
+	}
+	value = stol(hi, nullptr, 2);
+
+	return value;
+
+}
+
 vector_t Hash::random_vector()
 {
 	normal_distribution<double> distribution(0.0, 1.0);

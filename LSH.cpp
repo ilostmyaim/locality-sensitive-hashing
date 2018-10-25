@@ -51,7 +51,7 @@ void LSH::executeLSH(Metric metric)
 	string line;
 	int C=1;
 	double pValue=0,qValue=0; //read values from input file and query file here
-	vector<double> vec; //store p_values to vec while reading
+	vector_t vec; //store p_values to vec while reading
 	ifstream inputFile(_inputFile);// input file stream
 	ifstream queryFile(_queryFile);
 	string hash_string;
@@ -65,33 +65,35 @@ void LSH::executeLSH(Metric metric)
 			/*start reading points*/
 			//
 			if (inputFile.is_open()) {
-				while(inputFile >> pValue) {
-					if(i_vec < DIMENSION){ 
+				while(getline(inputFile, line)) {
+					stringstream stream(line);
+					while(1){
+						stream >> pValue;
+						if(!stream)
+							break;
 						vec.push_back(pValue);
-						i_vec++;
 					}
-					else{//create hi hash functions and concatenate to create g
-						item.vec = vec;
-						vec_id++;
-						item.id = vec_id;
-						//cout << "VEC_ID = " << vec_id << endl; 
-						if(metric == euclidean){
-							hash_value = _arrayOfHashTables[i_l]->hash(vec);
-							actualHashValue = ((hash_value % M) + M) % _hashTableSize;
-						}
-						else{
-							hash_value = _arrayOfHashTables[i_l]->cosineHash(vec);
-							actualHashValue = hash_value;
-						}
-
-						
-						//cout << "Actual hashvalue " << actualHashValue << endl;
-						_arrayOfHashTables[i_l]->insertItem(item,actualHashValue);
-						//clear vec and hash_value string
-						vec.clear();
-						
-						i_vec=0;
+					//create hi hash functions and concatenate to create g
+					item.vec = vec;
+					vec_id++;
+					item.id = vec_id;
+					//cout << "VEC_ID = " << vec_id << endl;
+					print_vector(vec); 
+					if(metric == euclidean){
+						hash_value = _arrayOfHashTables[i_l]->hash(vec);
+						actualHashValue = ((hash_value % M) + M) % _hashTableSize;
 					}
+					else{
+						hash_value = _arrayOfHashTables[i_l]->cosineHash(vec);
+						actualHashValue = hash_value;
+					}
+					
+					//cout << "Actual hashvalue " << actualHashValue << endl;
+					_arrayOfHashTables[i_l]->insertItem(item,actualHashValue);
+					//clear vec and hash_value string
+					vec.clear();
+					//vec.push_back(pValue);
+					
 				
 				}
 				
@@ -107,104 +109,55 @@ void LSH::executeLSH(Metric metric)
 			}		
 		
 		}// after filling the hashtables start the query
-
-	if(metric == euclidean){
-		/*first read R from query file */
 		if(queryFile.is_open()){ 
-			i_vec = 0;
-			vec.clear();
-			queryFile >> tmp >> R;
-			cout << "Radius is: " << R << endl;
-			if(R == 0){ // find nearest neighbor
-				/*********** Nearest neighbor*********/
-				cout << "Nearest Neighbor" << endl;
-				while(queryFile >> pValue) {
-					if(i_vec < DIMENSION) {
-						vec.push_back(qValue);
-						i_vec++;
-					}
-					else{
-						cout << endl;
-						cout << "Query: " << q_id << endl;
-						q_id++;
-						nearestNeighbor(vec,metric);
-						vec.clear();
-						i_vec=0;
-					}
+		vec.clear();
+		getline(queryFile, line);
+		stringstream stream(line);
+		stream >> tmp >> R;
+		cout << "Radius is: " << R << endl;
+		if(R == 0){ // find nearest neighbor
+			/*********** Nearest neighbor*********/
+			cout << "Nearest Neighbor" << endl;
+			while(getline(queryFile, line)) {
+				stringstream stream(line);
+				while(1){
+					stream >> pValue;
+					if(!stream)
+						break;
+					vec.push_back(pValue);
 				}
-			}
-			else {
-				cout << "Range Search"<< endl;
-				/*********Range Search***********/
-				while(queryFile >> pValue) {
-					if(i_vec < DIMENSION){
-						//cout << pValue << " ";
-						vec.push_back(pValue);
-						i_vec++;
-					}
-					else{
-						cout << endl;
-						cout << "Query: " << q_id << endl;
-						q_id++;
-						rangeSearch(vec,R,C,metric);
-						vec.clear();
-						i_vec=0;
-					}
-				}
+				
+				cout << endl;
+				cout << "Query: " << q_id << endl;
+				q_id++;
+				nearestNeighbor(vec,metric);
+				vec.clear();
+				
 			}
 		}
-		
-
-
-		cout << "finished" << endl;
-	}
-	else if(metric == cosine){
-		//do stuff
-		if(queryFile.is_open()){ 
-			i_vec = 0;
-			vec.clear();
-			queryFile >> tmp >> R;
-			cout << "Radius is: " << R << endl;
-			if(R == 0){ // find nearest neighbor
-				/*********** Nearest neighbor*********/
-				cout << "Nearest Neighbor" << endl;
-				while(queryFile >> pValue) {
-					if(i_vec < DIMENSION) {
-						vec.push_back(pValue);
-						i_vec++;
-					}
-					else{
-						cout << endl;
-						cout << "Query: " << q_id << endl;
-						print_vector(vec);
-						q_id++;
-						nearestNeighbor(vec,metric);
-						vec.clear();
-						i_vec=0;
-					}
+		else {
+			cout << "Range Search"<< endl;
+			/*********Range Search***********/
+			while(getline(queryFile, line)) {
+				stringstream stream(line);
+				while(1){
+					stream >> pValue;
+					if(!stream)
+						break;
+					vec.push_back(pValue);
 				}
-			}
-			else {
-				cout << "Range Search"<< endl;
-				/*********Range Search***********/
-				while(queryFile >> pValue) {
-					if(i_vec < DIMENSION){
-						//cout << pValue << " ";
-						vec.push_back(pValue);
-						i_vec++;
-					}
-					else{
-						cout << endl;
-						cout << "Query: " << q_id << endl;
-						q_id++;
-						rangeSearch(vec,R,C,metric);
-						vec.clear();
-						i_vec=0;
-					}
-				}
+				
+				cout << endl;
+				cout << "Query: " << q_id << endl;
+				print_vector(vec);
+				q_id++;
+				rangeSearch(vec,R,C,metric);
+				vec.clear();
 			}
 		}
 	}
+
+
 }
 
 

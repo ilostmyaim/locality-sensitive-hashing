@@ -28,6 +28,9 @@ private:
 	vector_t vec_t; //keep offset t here
 	std::vector<vector_t > vec_v; //keep random vectors here(v for euclidean , ri for cosine)
 	std::list<item_t> *_hashTable;
+	/*every value_vec[i] is mapped to a one_zero_vec[i]*/
+	std::vector<int> one_zero_vec;
+	std::vector<int> value_vec;
 	
 public:
 	//constructor
@@ -40,6 +43,7 @@ public:
 
 	long int hash(vector_t p);
 	long int cosineHash(vector_t p);
+	long int hashCUBE(vector_t p);
 	vector_t random_vector();
 	double random_offset();
 	std::string combine();
