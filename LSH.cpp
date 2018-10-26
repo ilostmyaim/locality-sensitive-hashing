@@ -30,8 +30,8 @@ LSH::LSH(int k, int L, string inputFile, string outputFile, string queryFile,Met
 			while(getline(inFile, line))
 				++count;
 		}
-		cout << "Number of lines read is: " << count << endl;
-		_hashTableSize = count / 16;
+		//cout << "Number of lines read is: " << count << endl;
+		_hashTableSize = count / 4;
 
 	}
 	else if(metric == cosine){ 
@@ -76,9 +76,7 @@ void LSH::executeLSH(Metric metric)
 					//create hi hash functions and concatenate to create g
 					item.vec = vec;
 					vec_id++;
-					item.id = vec_id;
-					//cout << "VEC_ID = " << vec_id << endl;
-					print_vector(vec); 
+					item.id = vec_id; 
 					if(metric == euclidean){
 						hash_value = _arrayOfHashTables[i_l]->hash(vec);
 						actualHashValue = ((hash_value % M) + M) % _hashTableSize;
@@ -87,12 +85,9 @@ void LSH::executeLSH(Metric metric)
 						hash_value = _arrayOfHashTables[i_l]->cosineHash(vec);
 						actualHashValue = hash_value;
 					}
-					
-					//cout << "Actual hashvalue " << actualHashValue << endl;
 					_arrayOfHashTables[i_l]->insertItem(item,actualHashValue);
-					//clear vec and hash_value string
+					//clear vec
 					vec.clear();
-					//vec.push_back(pValue);
 					
 				
 				}
@@ -117,7 +112,6 @@ void LSH::executeLSH(Metric metric)
 		cout << "Radius is: " << R << endl;
 		if(R == 0){ // find nearest neighbor
 			/*********** Nearest neighbor*********/
-			cout << "Nearest Neighbor" << endl;
 			while(getline(queryFile, line)) {
 				stringstream stream(line);
 				while(1){
@@ -126,9 +120,9 @@ void LSH::executeLSH(Metric metric)
 						break;
 					vec.push_back(pValue);
 				}
-				
 				cout << endl;
 				cout << "Query: " << q_id << endl;
+				cout << "Nearest neighbor method" << endl;
 				q_id++;
 				nearestNeighbor(vec,metric);
 				vec.clear();
@@ -136,7 +130,6 @@ void LSH::executeLSH(Metric metric)
 			}
 		}
 		else {
-			cout << "Range Search"<< endl;
 			/*********Range Search***********/
 			while(getline(queryFile, line)) {
 				stringstream stream(line);
@@ -146,10 +139,9 @@ void LSH::executeLSH(Metric metric)
 						break;
 					vec.push_back(pValue);
 				}
-				
 				cout << endl;
 				cout << "Query: " << q_id << endl;
-				print_vector(vec);
+				cout << "R-near neighbors method "<< endl;
 				q_id++;
 				rangeSearch(vec,R,C,metric);
 				vec.clear();
@@ -164,8 +156,7 @@ void LSH::executeLSH(Metric metric)
 void LSH::displayLSH()
 {
 	cout << "display lsh" << endl;
-	for(int i = 0;i<this->_L;i++){
-		
+	for(int i = 0;i<this->_L;i++){	
 		cout << "Printing hashtable["<<i<<"]"<<endl;
 		_arrayOfHashTables[i]->displayHash();
 
@@ -181,28 +172,15 @@ void LSH::rangeSearch(vector_t q, double R, double C=1, Metric metric = euclidea
 	long double actualHashValue=0; 
 	if(metric == euclidean){ 
 		for(i_l = 0; i_l < _L; i_l++){
-			
-	
 			hash_value = _arrayOfHashTables[i_l]->hash(q);
-			//cout << "hash_value = " << hash_value << endl;
 			actualHashValue = ((hash_value % M) + M) % _hashTableSize;
-			//cout << "actualHashValue = " << actualHashValue << endl;
-			//cout << "Inside range search "<< endl;
-			//cout << "ActualHashValue: " << actualHashValue << endl;
-			//cout << "Hashtable["<<i_l<<"]" << endl;
 			_arrayOfHashTables[i_l]->traverseBucket(q, actualHashValue, R, C , metric);
 		}
 	}
 	else{
 		for(i_l = 0; i_l < _L; i_l++){
-	
 			hash_value = _arrayOfHashTables[i_l]->cosineHash(q);
-			//cout << "hash_value = " << hash_value << endl;
 			actualHashValue = hash_value;
-			//cout << "actualHashValue = " << actualHashValue << endl;
-			//cout << "Inside range search "<< endl;
-			//cout << "ActualHashValue: " << actualHashValue << endl;
-			//cout << "Hashtable["<<i_l<<"]" << endl;
 			_arrayOfHashTables[i_l]->traverseBucket(q, actualHashValue, R, C , metric);
 		}
 	}

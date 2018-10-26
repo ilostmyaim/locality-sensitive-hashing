@@ -40,21 +40,23 @@ void Hash::insertItem(item_t item,unsigned int hashValue)
 void Hash::traverseBucket(vector_t q, long int hashValue,double R, double C=1,Metric metric=euclidean)
 {
 	double distance = 0;
-	cout << "Range Search in Bucket["<<hashValue<<"]"<<endl;
+	//cout << "Range Search in Bucket["<<hashValue<<"]"<<endl;
 	for(auto x: _hashTable[hashValue]){
 		/*calculate Eucledian deistance*/
 		if(metric == euclidean) { 
 			distance = euclideanNorm(q,x.vec);
 			if( distance < C*R){
-				cout << "distance: " << distance << endl;
-				print_vector(x.vec);
+				cout << "Item: "<< x.id << " " << distance << endl;
+				//cout << "distance: " << distance << endl;
+				//print_vector(x.vec);
 			}
 		}
 		else if(metric == cosine) {
-			distance = cosineSimilarity(q,x.vec);
-			if( distance < C * R){ 
-				cout << "cosine distance: " << distance << endl;
-				print_vector(x.vec);
+			distance = 1 -cosineSimilarity(q,x.vec);
+			if( distance < C*R){ 
+				cout << "Item: "<< x.id << " " << distance << endl;
+				//cout << "cosine distance: " << distance << endl;
+				//print_vector(x.vec);
 			}
 		}	
 	}
@@ -67,16 +69,18 @@ void Hash::nearestNeighborTraverse(vector_t q, long int hashValue, int L, Metric
 	int count_retrieved = 0;
 	int nearest_id = 0;
 	vector_t nearest_vec;
+	int approximateNN_flag = 0;
 	//cout << "NN-Search in Bucket["<<hashValue<<"]"<<endl;
 	for(auto x: _hashTable[hashValue]){
 		/*calculate Eucledian deistance*/
 		if(metric == euclidean){ 
 			distance = euclideanNorm(q,x.vec);
 			count_retrieved++;
-			if(count_retrieved > 3*L){
+			if(count_retrieved > 3*L && approximateNN_flag == 0){
 				cout << "Approximate NN: " << x.id << endl; 
-				print_vector(x.vec);
-				break;
+				cout << "Distance: " << distance << endl;
+				//print_vector(x.vec);
+				approximateNN_flag = 1;
 			}
 			if( distance <= min_distance){
 				min_distance = distance;
@@ -85,15 +89,16 @@ void Hash::nearestNeighborTraverse(vector_t q, long int hashValue, int L, Metric
 			}
 		}
 		else if (metric == cosine){
-			min_distance = -1;
-			distance = cosineSimilarity(q, x.vec);
+			min_distance = 2;
+			distance = 1 - cosineSimilarity(q, x.vec);
 			count_retrieved++;
-			if(count_retrieved > 3*L){
+			if(count_retrieved > 3*L && approximateNN_flag == 0){
 				cout << "Approximate NN: " << x.id << endl; 
-				print_vector(x.vec);
-				break;
+				cout << "Distance: " << distance << endl;
+				//print_vector(x.vec);
+				approximateNN_flag = 1;
 			}
-			if( distance >= min_distance){
+			if( distance <= min_distance){
 				min_distance = distance;
 				nearest_id = x.id;
 				nearest_vec = x.vec;
@@ -101,7 +106,8 @@ void Hash::nearestNeighborTraverse(vector_t q, long int hashValue, int L, Metric
 		}	
 	}
 	cout << "Nearest neighbor is: " << nearest_id << endl;
-	print_vector(nearest_vec);
+	cout << "Nearest neighbor distance is: " << min_distance << endl;
+	//print_vector(nearest_vec);
 }
 
 void Hash::displayHash()

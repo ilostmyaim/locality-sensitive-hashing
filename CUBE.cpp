@@ -110,6 +110,7 @@ int CUBE::executeCUBE(Metric metric)
 			if(metric == euclidean) {
 				hash_value = _hashTable->hashCUBE(vec);
 				actualHashValue = ((hash_value % M) + M) % _hashTableSize;
+				//print_vector(vec);
 			}
 			else{
 				hash_value = _hashTable->cosineHash(vec);
@@ -121,8 +122,6 @@ int CUBE::executeCUBE(Metric metric)
 
 		//reinitialize vec_id to zero
 		vec_id = 0;
-		//vec.clear();
-		//clear inputFile and start reading again from the beginning
 		inputFile.clear();
 		inputFile.seekg(0,ios::beg);
 		if(inputFile.bad()){
@@ -141,7 +140,6 @@ int CUBE::executeCUBE(Metric metric)
 		cout << "Radius is: " << R << endl;
 		if(R == 0){ // find nearest neighbor
 			/*********** Nearest neighbor*********/
-			cout << "Nearest Neighbor" << endl;
 			while(getline(queryFile, line)) {
 				stringstream stream(line);
 				while(1){
@@ -153,6 +151,7 @@ int CUBE::executeCUBE(Metric metric)
 				
 				cout << endl;
 				cout << "Query: " << q_id << endl;
+				cout << "Nearest neighbor method" << endl;
 				q_id++;
 				nearestNeighbor(vec,metric);
 				vec.clear();
@@ -160,7 +159,6 @@ int CUBE::executeCUBE(Metric metric)
 			}
 		}
 		else {
-			cout << "Range Search"<< endl;
 			/*********Range Search***********/
 			while(getline(queryFile, line)) {
 				stringstream stream(line);
@@ -173,7 +171,8 @@ int CUBE::executeCUBE(Metric metric)
 				
 				cout << endl;
 				cout << "Query: " << q_id << endl;
-				print_vector(vec);
+				cout << "R-near neighbors method "<< endl;
+				//print_vector(vec);
 				q_id++;
 				rangeSearch(vec,R,C,metric);
 				vec.clear();
@@ -202,26 +201,66 @@ void CUBE::rangeSearch(vector_t q, double R, double C=1, Metric metric = euclide
 	int i_l;
 	string hash_string;
 	long int hash_value;
-	long double actualHashValue=0; 
+	long double actualHashValue=0;
+	long int tmp_hash;
+	int tmp_probes;
+	tmp_probes = this->_probes; 
 	if(metric == euclidean){ 
 		hash_value = _hashTable->hashCUBE(q);
-		//cout << "hash_value = " << hash_value << endl;
 		actualHashValue = ((hash_value % M) + M) % _hashTableSize;
-		//cout << "actualHashValue = " << actualHashValue << endl;
-		//cout << "Inside range search "<< endl;
-		//cout << "ActualHashValue: " << actualHashValue << endl;
-		//cout << "Hashtable["<<i_l<<"]" << endl;
 		_hashTable->traverseBucket(q, actualHashValue, R, C , metric);
+		
+		tmp_probes--;
+		tmp_hash = actualHashValue - 1;
+		while(tmp_probes > 0){ //start checking left neighbor buckets
+			if(tmp_hash >= 0){
+				_hashTable->traverseBucket(q,tmp_hash, R,C,metric);
+				tmp_probes--;
+				tmp_hash--;
+			}
+			else{
+				break;
+			}
+		}
+		tmp_hash = actualHashValue + 1;
+		while(tmp_probes > 0){ //start checking righ neighbor buckets
+			if(tmp_hash < this->_hashTableSize){
+				_hashTable->traverseBucket(q,tmp_hash, R,C,metric);
+				tmp_probes--;
+				tmp_hash++;
+			}
+			else{
+				break;
+			}
+		}
 	}
 	else{
 		hash_value = _hashTable->cosineHash(q);
-		//cout << "hash_value = " << hash_value << endl;
 		actualHashValue = hash_value;
-		//cout << "actualHashValue = " << actualHashValue << endl;
-		//cout << "Inside range search "<< endl;
-		//cout << "ActualHashValue: " << actualHashValue << endl;
-		//cout << "Hashtable["<<i_l<<"]" << endl;
 		_hashTable->traverseBucket(q, actualHashValue, R, C , metric);
+		tmp_probes--;
+		tmp_hash = actualHashValue - 1;
+		while(tmp_probes > 0){ //start checking left neighbor buckets
+			if(tmp_hash >= 0){
+				_hashTable->traverseBucket(q, actualHashValue, R, C , metric);
+				tmp_probes--;
+				tmp_hash--;
+			}
+			else{
+				break;
+			}
+		}
+		tmp_hash = actualHashValue + 1;
+		while(tmp_probes > 0){ //start checking righ neighbor buckets
+			if(tmp_hash < this->_hashTableSize){
+				_hashTable->traverseBucket(q, actualHashValue, R, C , metric);
+				tmp_probes--;
+				tmp_hash++;
+			}
+			else{
+				break;
+			}
+		}
 	}
 }
 
@@ -232,23 +271,55 @@ void CUBE::nearestNeighbor(vector_t q,Metric metric)
 	string hash_string;
 	long int hash_value;
 	long double actualHashValue=0; 
+	long int tmp_hash;
+	int tmp_probes = this->_probes;
 	if(metric == euclidean){ 
 	
 		hash_value = _hashTable->hashCUBE(q);
 		actualHashValue = ((hash_value % M) + M) % _hashTableSize;
-		//cout << "Inside range search "<< endl;
-		//cout << "ActualHashValue: " << actualHashValue << endl;
-		//cout << "Hashtable["<<i_l<<"]" << endl;
-		_hashTable->nearestNeighborTraverse(q, actualHashValue, this->_MC,metric);
+		_hashTable->nearestNeighborTraverse(q, actualHashValue, this->_MC/3,metric);
+		tmp_probes--;
+		tmp_hash = actualHashValue - 1;
+		while(tmp_probes > 0){ //start checking left neighbor buckets
+			if(tmp_hash >= 0){
+				_hashTable->nearestNeighborTraverse(q,tmp_hash, this->_MC/3,metric);
+				tmp_probes--;
+				tmp_hash--;
+			}
+		}
+		tmp_hash = actualHashValue + 1;
+		while(tmp_probes > 0){ //start checking righ neighbor buckets
+			if(tmp_hash < this->_hashTableSize){
+				_hashTable->nearestNeighborTraverse(q,tmp_hash, this->_MC/3,metric);
+				tmp_probes--;
+				tmp_hash++;
+			}
+		}
+
 	
 	}
 	else{
 		hash_value = _hashTable->cosineHash(q);
 		actualHashValue = hash_value;
-		//cout << "Inside range search "<< endl;
-		//cout << "ActualHashValue: " << actualHashValue << endl;
-		//cout << "Hashtable["<<i_l<<"]" << endl;
-		_hashTable->nearestNeighborTraverse(q, actualHashValue, this->_MC,metric);
+		_hashTable->nearestNeighborTraverse(q, actualHashValue, this->_MC/3,metric);
+
+		tmp_probes--;
+		tmp_hash = actualHashValue - 1;
+		while(tmp_probes > 0){ //start checking left neighbor buckets
+			if(tmp_hash >= 0){
+				_hashTable->nearestNeighborTraverse(q,tmp_hash, this->_MC/3,metric);
+				tmp_probes--;
+				tmp_hash--;
+			}
+		}
+		tmp_hash = actualHashValue + 1;
+		while(tmp_probes > 0){ //start checking righ neighbor buckets
+			if(tmp_hash < this->_hashTableSize){
+				_hashTable->nearestNeighborTraverse(q,tmp_hash, this->_MC/3,metric);
+				tmp_probes--;
+				tmp_hash++;
+			}
+		}
 	}
 }
 
