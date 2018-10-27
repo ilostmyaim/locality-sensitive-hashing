@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
 	initParametersCube(&d, &m, &probes, input_file, output_file, query_file, argc, argv);
 
 	/*create a Hybercube object*/
-	Metric metric = euclidean;
+	Metric metric = cosine;
 
 	CUBE cubeObject(d, m, probes, input_file, output_file, query_file, metric);
 	cubeObject.executeCUBE(metric);

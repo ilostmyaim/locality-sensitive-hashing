@@ -42,6 +42,14 @@ LSH::LSH(int k, int L, string inputFile, string outputFile, string queryFile,Met
 	}
 }
 
+LSH::~LSH()
+{
+	for(int i = 0;i<_L;i++){
+		delete _arrayOfHashTables[i];
+	}
+	delete[] _arrayOfHashTables;
+}
+
 void LSH::executeLSH(Metric metric)
 {
 	//do stuff
@@ -54,6 +62,9 @@ void LSH::executeLSH(Metric metric)
 	vector_t vec; //store p_values to vec while reading
 	ifstream inputFile(_inputFile);// input file stream
 	ifstream queryFile(_queryFile);
+	ofstream outputFile(_outputFile);
+	streambuf *coutbuf = cout.rdbuf();
+	cout.rdbuf(outputFile.rdbuf());
 	string hash_string;
 	long int hash_value;
 	long double actualHashValue=0; 
@@ -104,7 +115,7 @@ void LSH::executeLSH(Metric metric)
 			}		
 		
 		}// after filling the hashtables start the query
-		if(queryFile.is_open()){ 
+	if(queryFile.is_open()){ 
 		vec.clear();
 		getline(queryFile, line);
 		stringstream stream(line);
@@ -148,6 +159,8 @@ void LSH::executeLSH(Metric metric)
 			}
 		}
 	}
+
+	cout.rdbuf(coutbuf);
 
 
 }
@@ -213,6 +226,15 @@ void LSH::nearestNeighbor(vector_t q,Metric metric)
 		}
 
 	}
+}
+
+int LSH::sizeofLSH()
+{
+	int memorySum = 0;
+	for(int i = 0;i<_L;i++){
+		memorySum += sizeof(_arrayOfHashTables[i]);
+	}
+	return memorySum;
 }
 
 void initParameters(int* k, int* L, std::string &input_file, std::string & output_file, std::string & query_file,int argc, char** argv)

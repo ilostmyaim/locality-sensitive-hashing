@@ -6,11 +6,13 @@
 #include <random>
 #include <list>
 #include <ctime>
+#include <chrono>
 #include "LSH.h"
 #include "hash.h"
 
 
 using namespace std;
+using namespace std::chrono;
 
 using std::default_random_engine;
 
@@ -70,6 +72,8 @@ void Hash::nearestNeighborTraverse(vector_t q, long int hashValue, int L, Metric
 	int nearest_id = 0;
 	vector_t nearest_vec;
 	int approximateNN_flag = 0;
+	auto start_appNN = high_resolution_clock::now();
+	auto start_NN = high_resolution_clock::now();
 	//cout << "NN-Search in Bucket["<<hashValue<<"]"<<endl;
 	for(auto x: _hashTable[hashValue]){
 		/*calculate Eucledian deistance*/
@@ -77,8 +81,14 @@ void Hash::nearestNeighborTraverse(vector_t q, long int hashValue, int L, Metric
 			distance = euclideanNorm(q,x.vec);
 			count_retrieved++;
 			if(count_retrieved > 3*L && approximateNN_flag == 0){
+				auto stop_appNN = high_resolution_clock::now();
+				duration<double> duration_appNN = (stop_appNN - start_appNN);
+				cout<< "*****************************************" << endl;
 				cout << "Approximate NN: " << x.id << endl; 
 				cout << "Distance: " << distance << endl;
+				printf("Approximate NN time: %.7fs\n" ,duration_appNN.count());
+				cout<< "*****************************************" << endl;
+				//cout << "Approximate NN time: " << (duration_appNN).count() << endl;
 				//print_vector(x.vec);
 				approximateNN_flag = 1;
 			}
@@ -93,8 +103,13 @@ void Hash::nearestNeighborTraverse(vector_t q, long int hashValue, int L, Metric
 			distance = 1 - cosineSimilarity(q, x.vec);
 			count_retrieved++;
 			if(count_retrieved > 3*L && approximateNN_flag == 0){
+				auto stop_appNN = high_resolution_clock::now();
+				duration<double> duration_appNN = (stop_appNN - start_appNN);
+				cout<< "*****************************************" << endl;
 				cout << "Approximate NN: " << x.id << endl; 
 				cout << "Distance: " << distance << endl;
+				printf("Approximate NN time: %.7fs\n" ,duration_appNN.count());
+				cout<< "*****************************************" << endl;
 				//print_vector(x.vec);
 				approximateNN_flag = 1;
 			}
@@ -105,9 +120,12 @@ void Hash::nearestNeighborTraverse(vector_t q, long int hashValue, int L, Metric
 			}
 		}	
 	}
-	cout << "Nearest neighbor is: " << nearest_id << endl;
-	cout << "Nearest neighbor distance is: " << min_distance << endl;
-	//print_vector(nearest_vec);
+	auto stop_NN = high_resolution_clock::now();
+	/*calculate time for Nearest neighbor*/
+	duration<double> duration_NN = (stop_NN - start_NN);
+	cout << "Nearest neighbor: " << nearest_id << endl;
+	cout << "distanceTrue: " << min_distance << endl;
+	printf("tLSH: %.7fs\n" ,duration_NN.count());
 }
 
 void Hash::displayHash()

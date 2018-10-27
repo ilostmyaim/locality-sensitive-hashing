@@ -30,6 +30,7 @@ private:
 public:
 
 	LSH(int k=4, int L=5, std::string inputFile = "input_file", std::string outputFile="output_file", std::string queryFile="query_file", Metric metric = euclidean); //constructor
+	~LSH();
 	int get_k();
 	int get_L();
 	std::string get_inputFile();
@@ -38,6 +39,7 @@ public:
 	void displayLSH();
 	void rangeSearch(vector_t q,double R, double C, Metric metric);
 	void nearestNeighbor(vector_t, Metric metric);
+	int sizeofLSH();
 
 };
 

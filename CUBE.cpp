@@ -286,6 +286,9 @@ void CUBE::nearestNeighbor(vector_t q,Metric metric)
 				tmp_probes--;
 				tmp_hash--;
 			}
+			else{
+				break;
+			}
 		}
 		tmp_hash = actualHashValue + 1;
 		while(tmp_probes > 0){ //start checking righ neighbor buckets
@@ -310,6 +313,9 @@ void CUBE::nearestNeighbor(vector_t q,Metric metric)
 				_hashTable->nearestNeighborTraverse(q,tmp_hash, this->_MC/3,metric);
 				tmp_probes--;
 				tmp_hash--;
+			}
+			else{
+				break;
 			}
 		}
 		tmp_hash = actualHashValue + 1;
