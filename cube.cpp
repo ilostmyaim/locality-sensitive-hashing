@@ -4,47 +4,39 @@
 #include <string>
 #include <sstream>
 #include <cmath>
-#include <chrono>
-#include "LSH.h"
-#include "hash.h"
-
+#include "CUBE.h"
 
 using namespace std;
 
-
 int main(int argc, char **argv) {
 	vector_t vec;
-	string line;
 
-	int k,L;
+	int d,m,probes;
 	string input_file, output_file, query_file, met;
-	Metric metric = cosine;
+	Metric metric;
 	/*initialize parameters*/
-	initParameters(&k, &L, input_file, output_file, query_file, met, argc, argv);
-
-	if(met == "cosine")
+	initParametersCube(&d, &m, &probes, input_file, output_file, query_file, met, argc, argv);
+	if(met.compare("cosine") == 0) { 
 		metric = cosine;
-	else
+	}
+	else{ 
 		metric = euclidean;
-	/*create an LSH object*/
-	
-	LSH lshObject(k, L, input_file, output_file, query_file,metric);
+	}
+
+	/*create a Hybercube object*/
+	//metric = cosine;
+	CUBE cubeObject(d, m, probes, input_file, output_file, query_file, metric);
 
 	ofstream outputFile(output_file);
 	streambuf *coutbuf = cout.rdbuf();
 	cout.rdbuf(outputFile.rdbuf());
 
-	lshObject.executeLSH(metric);
 	
-	//lshObject.displayLSH();
+	cubeObject.executeCUBE(metric);
+	
+	//cubeObject.displayCUBE();
+	
 	cout.rdbuf(coutbuf);
-	
-	
 
 
-
-
-
-	return 0;
-
-}
+}	

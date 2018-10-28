@@ -30,21 +30,21 @@ private:
 public:
 
 	LSH(int k=4, int L=5, std::string inputFile = "input_file", std::string outputFile="output_file", std::string queryFile="query_file", Metric metric = euclidean); //constructor
+	~LSH();
 	int get_k();
 	int get_L();
 	std::string get_inputFile();
 	std::string get_outputFile();
-	int hash(int ,int);
 	void executeLSH(Metric);
 	void displayLSH();
-	void insertLSH(item_t item,unsigned int hashValue, int l);
 	void rangeSearch(vector_t q,double R, double C, Metric metric);
 	void nearestNeighbor(vector_t, Metric metric);
+	int sizeofLSH();
 
 };
 
 /*parse command line parameters*/
-void initParameters(int* k, int* L, std::string & input_file, std::string & output_file, std::string & query_file,int argc, char** argv);
+void initParameters(int* k, int* L, std::string & input_file, std::string & output_file, std::string & query_file,std::string met,int argc, char** argv);
 
 
 
