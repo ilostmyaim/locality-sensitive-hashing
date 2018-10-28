@@ -44,7 +44,7 @@ public:
 };
 
 /*parse command line parameters*/
-void initParameters(int* k, int* L, std::string & input_file, std::string & output_file, std::string & query_file,std::string met,int argc, char** argv);
+void initParameters(int* k, int* L, std::string & input_file, std::string & output_file, std::string & query_file,std::string &met,int argc, char** argv);
 
 
 

@@ -18,11 +18,11 @@ int main(int argc, char **argv) {
 
 	int k,L;
 	string input_file, output_file, query_file, met;
-	Metric metric = cosine;
+	Metric metric;
 	/*initialize parameters*/
 	initParameters(&k, &L, input_file, output_file, query_file, met, argc, argv);
 
-	if(met == "cosine")
+	if(met.compare("cosine") == 0)
 		metric = cosine;
 	else
 		metric = euclidean;

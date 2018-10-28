@@ -116,13 +116,15 @@ void LSH::executeLSH(Metric metric)
 		}		
 	
 	}// after filling the hashtables start the query
+	cout.precision(9);
 	if(queryFile.is_open()){ 
-		cout.precision(9);
+		
 		vec.clear();
 		getline(queryFile, line);
 		stringstream stream(line);
 		stream >> tmp >> R;
 		cout << "Radius is: " << R << endl;
+
 		if(R == 0){ // find nearest neighbor
 			/*********** Nearest neighbor*********/
 			auto start = high_resolution_clock::now();
@@ -143,8 +145,8 @@ void LSH::executeLSH(Metric metric)
 				
 			}
 			auto stop = high_resolution_clock::now();
-			auto duration = duration_cast<seconds>(stop-start);
-			cout << "Time = " << duration.count() << "seconds" << endl;
+			duration<double> _duration= (stop-start);
+			cout << "Time = " << _duration.count() << std::fixed << "seconds" << endl;
 		}
 		else {
 			/*********Range Search***********/
@@ -165,8 +167,8 @@ void LSH::executeLSH(Metric metric)
 				vec.clear();
 			}
 			auto stop = high_resolution_clock::now();
-			auto duration = duration_cast<seconds>(stop-start);
-			cout << "Time = " << duration.count() << "seconds" << endl;
+			duration<double> _duration= (stop-start);
+			cout << "Time = " << _duration.count() << std::fixed <<"seconds" << endl;
 		}
 	}
 	
@@ -240,7 +242,7 @@ int LSH::sizeofLSH()
 	return memorySum;
 }
 
-void initParameters(int* k, int* L, std::string &input_file, std::string & output_file, std::string & query_file,string met,int argc, char** argv)
+void initParameters(int* k, int* L, std::string &input_file, std::string & output_file, std::string & query_file,string &met,int argc, char** argv)
 {
 	int i;
 	//int k_flag = 0, L_flag = 1, input_flag = 1, output_flag = 1, query_flag = 1;

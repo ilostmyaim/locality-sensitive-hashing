@@ -137,8 +137,8 @@ int CUBE::executeCUBE(Metric metric)
 
 	
 	/*first read R from query file */
+	cout.precision(9);
 	if(queryFile.is_open()){ 
-		cout.precision(9);
 		vec.clear();
 		getline(queryFile, line);
 		stringstream stream(line);
@@ -165,8 +165,8 @@ int CUBE::executeCUBE(Metric metric)
 				
 			}
 			auto stop = high_resolution_clock::now();
-			auto duration = duration_cast<seconds>(stop-start);
-			cout << "Time = " << duration.count() << "seconds" << endl;
+			duration<double> _duration= (stop-start);
+			cout << "Time = " << _duration.count() << std::fixed << "seconds" << endl;
 		}
 		else {
 			/*********Range Search***********/
@@ -189,8 +189,8 @@ int CUBE::executeCUBE(Metric metric)
 				vec.clear();
 			}
 			auto stop = high_resolution_clock::now();
-			auto duration = duration_cast<seconds>(stop-start);
-			cout << "Time = " << duration.count() << "seconds" << endl;
+			duration<double> _duration= (stop-start);
+			cout << "Time = " << _duration.count() << std::fixed << "seconds" << endl;
 		}
 	}
 		
