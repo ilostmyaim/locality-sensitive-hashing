@@ -65,74 +65,84 @@ void Hash::traverseBucket(vector_t q, long int hashValue,double R, double C=1,Me
 	}
 }
 /*Nearest Neighbor serach*/
-void Hash::nearestNeighborTraverse(vector_t q, long int hashValue, int L, Metric metric)
+double Hash::nearestNeighborTraverse(vector_t q, long int hashValue, int L, Metric metric)
 {
-	double distance = 0;
-	double min_distance = 1000000;
-	int count_retrieved = 0;
-	int nearest_id = 0;
+	double distance = 0, app_distance = 30000000;
+	double min_distance = 30000000;
+	int count_retrieved = 0; // check how many items have been retrieved
+	int nearest_id,app_id = 0; //NN and approximate NN id
 	vector_t nearest_vec;
-	int approximateNN_flag = 0;
-	auto start_appNN = high_resolution_clock::now();
-	auto start_NN = high_resolution_clock::now();
+	double approximation_factor = 0.8;//approximation factor for approximate NN
+	auto start_appNN = high_resolution_clock::now();//start stopwatch for approximate NN
+	auto start_NN = high_resolution_clock::now();//start stopwatch for NN
 	cout.precision(9);
-	//cout << "NN-Search in Bucket["<<hashValue<<"]"<<endl;
+	
+	//check if bucket is empty first
+	if(_hashTable[hashValue].empty())
+		return -1;
+	//for every node in _hashTable[hashValue]
 	for(auto x: _hashTable[hashValue]){
-		/*calculate Eucledian deistance*/
+		//calculate Eucledian deistance
 		if(metric == euclidean){ 
 			distance = euclideanNorm(q,x.vec);
 			count_retrieved++;
-			if(count_retrieved > 3*L && approximateNN_flag == 0){
-				auto stop_appNN = high_resolution_clock::now();
-				duration<double> duration_appNN = (stop_appNN - start_appNN);
-				cout<< "*****************************************" << endl;
-				cout << "Approximate NN: " << x.id << endl; 
-				cout << "Distance: " << distance << endl;
-				//printf("Approximate NN time: %.7fs\n" ,duration_appNN.count());
-				cout << "Approximate NN time: " << duration_appNN.count() << std::fixed << endl;
-				cout<< "*****************************************" << endl;
-				//cout << "Approximate NN time: " << (duration_appNN).count() << endl;
-				//print_vector(x.vec);
-				approximateNN_flag = 1;
-			}
-			if( distance <= min_distance){
+			if( distance <= min_distance){ //get minimum distance 
 				min_distance = distance;
 				nearest_id = x.id;
 				nearest_vec = x.vec;
+			}
+			if( distance <= (1+approximation_factor)*app_distance){// get approximate minimum distance
+				app_distance = distance;
+				app_id = x.id;
+
+			}
+
+			if(count_retrieved > 3*L){//stop if number of items retrieved is larger than 3*L
+				break;
 			}
 		}
 		else if (metric == cosine){
 			min_distance = 4;
-			distance = 1 - cosineSimilarity(q, x.vec);
+			app_distance = 4;
+			distance = 1 - cosineSimilarity(q, x.vec);//according to theory
 			count_retrieved++;
-			if(count_retrieved > 3*L && approximateNN_flag == 0){
-				auto stop_appNN = high_resolution_clock::now();
-				duration<double> duration_appNN = (stop_appNN - start_appNN);
-				cout<< "*****************************************" << endl;
-				cout << "Approximate NN: " << x.id << endl; 
-				cout << "Distance: " << distance << endl;
-				//printf("Approximate NN time: %.7fs\n" ,duration_appNN.count());
-				cout << "Approximate NN time: " << duration_appNN.count() << std::fixed<<endl;
-				cout<< "*****************************************" << endl;
-				//print_vector(x.vec);
-				approximateNN_flag = 1;
-			}
 			if( distance <= min_distance){
 				min_distance = distance;
 				nearest_id = x.id;
 				nearest_vec = x.vec;
 			}
+			if( distance <= (1-approximation_factor)*app_distance){
+				app_distance = distance;
+				app_id = x.id;
+
+			}
+			if(count_retrieved > 3*L){
+				break;
+			}
+			
 		}	
 	}
-	auto stop_NN = high_resolution_clock::now();
-	/*calculate time for Nearest neighbor*/
+	auto stop_appNN = high_resolution_clock::now();//stop app NN stopwatch
+	auto stop_NN = high_resolution_clock::now(); //stop NN stopwatch
+	//calculate timefor approximate NN
+	duration<double> duration_appNN = (stop_appNN - start_appNN);
+	//calculate time for Nearest neighbor
 	duration<double> duration_NN = (stop_NN - start_NN);
+	//output
 	cout << "Nearest neighbor: " << nearest_id << endl;
+	cout << "distanceLSH: " << app_distance << endl;
 	cout << "distanceTrue: " << min_distance << endl;
-	//printf("tLSH: %.7fs\n" ,duration_NN.count());
-	cout << "tLSH: " << duration_NN.count() << std::fixed << endl;
+	cout << "tLSH: " << duration_appNN.count() << std::fixed << endl;
+	cout << "tTrue: " << duration_NN.count() << std::fixed << endl;
+	double ret_val= double(app_distance/min_distance); //max ratio 
+	cout << "ret_val: " << ret_val << endl;
+	cout << "********************************" << endl;
+
+	
+	return (double)(ret_val);
 }
 
+//displays the buckets of a hashtable
 void Hash::displayHash()
 {
 	for(int i = 0;i<this->_tableSize;i++){
@@ -149,7 +159,7 @@ int Hash::getTableSize()
 	return this->_tableSize;
 }
 
-
+//Euclidean Norm
 double euclideanNorm(vector_t u, vector_t v)
 {
 	int i;
@@ -161,6 +171,7 @@ double euclideanNorm(vector_t u, vector_t v)
 	return sqrt(sum);
 }
 
+//Cosine Similarity
 double cosineSimilarity(vector_t x, vector_t y)
 {
 	double dot = 0, denom_x = 0, denom_y = 0;
@@ -186,7 +197,7 @@ double innerProduct(vector_t u, vector_t v)
 
 
 
-
+//generates g function 
 long int Hash::hash(vector_t p)
 {
 	long int value = 0;
@@ -201,21 +212,22 @@ long int Hash::hash(vector_t p)
 	return sum;
 }
 
+//hash function for cosine similarity
 long int Hash::cosineHash(vector_t p)
 {
 	long int value = 0;
 	string hi;
 	long int hash_value = 0;
 	for(int i = 0; i<(int)this->vec_v.size();i++){
-		value = ((innerProduct(p, this->vec_v[i])));
-		if(value >= 0){
+		value = ((innerProduct(p, this->vec_v[i])));//according to theory
+		if(value >= 0){ //according to theory
 			hi.append("1");
 		}
 		else{
 			hi.append("0");
 		}
 	}
-	//cout << "hi: " << hi << endl;
+	//get hash value from bitstring
 	hash_value = stol(hi, nullptr, 2);
 	
 	return hash_value ;
@@ -259,8 +271,6 @@ long int Hash::hashCUBE(vector_t p)
 				hi.append("1");
 			}
 		}
-		//sum of hi functions to create f
-		//sum+= (distribution(generator) * value);
 	}
 	value = stol(hi, nullptr, 2);
 
@@ -270,7 +280,7 @@ long int Hash::hashCUBE(vector_t p)
 
 vector_t Hash::random_vector()
 {
-	normal_distribution<double> distribution(0.0, 1.0);
+	normal_distribution<double> distribution(0.0, 1.0); //according to theory
 
 	vector_t vec_1;
 	int i;
@@ -285,13 +295,13 @@ vector_t Hash::random_vector()
 
 double Hash::random_offset()
 {
-	uniform_int_distribution<int> distribution(0,_w);
+	uniform_int_distribution<int> distribution(0,_w); //according to theory
 	double t;
 	t = distribution(generator);
 	return t;
-	//cout << "T = " << this->_t << endl;
 }
 
+//displays a vector
 void print_vector(vector_t v)
 {
 	cout << "vector: ";
@@ -300,4 +310,3 @@ void print_vector(vector_t v)
 	}
 	cout << endl;
 }
-//string L2_Hash_Family::combine()

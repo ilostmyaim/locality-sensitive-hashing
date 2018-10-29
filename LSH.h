@@ -8,6 +8,7 @@ class Hash;
 typedef struct item item_t;
 typedef std::vector<double> vector_t;
 
+
 enum Metric { euclidean , cosine } ;
 
 
@@ -38,7 +39,7 @@ public:
 	void executeLSH(Metric);
 	void displayLSH();
 	void rangeSearch(vector_t q,double R, double C, Metric metric);
-	void nearestNeighbor(vector_t, Metric metric);
+	double nearestNeighbor(vector_t, Metric metric);
 	int sizeofLSH();
 
 };

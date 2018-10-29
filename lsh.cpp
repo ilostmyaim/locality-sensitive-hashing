@@ -22,18 +22,19 @@ int main(int argc, char **argv) {
 	/*initialize parameters*/
 	initParameters(&k, &L, input_file, output_file, query_file, met, argc, argv);
 
+	/*decide which metric to use*/
 	if(met.compare("cosine") == 0)
 		metric = cosine;
 	else
 		metric = euclidean;
 	/*create an LSH object*/
-	
 	LSH lshObject(k, L, input_file, output_file, query_file,metric);
 
 	ofstream outputFile(output_file);
 	streambuf *coutbuf = cout.rdbuf();
 	cout.rdbuf(outputFile.rdbuf());
 
+	/*execute LSH for givern input and query files*/
 	lshObject.executeLSH(metric);
 	
 	//lshObject.displayLSH();

@@ -31,7 +31,7 @@ public:
 	int executeCUBE(Metric);
 	void displayCUBE();
 	void rangeSearch(vector_t q, double R, double C, Metric metric);
-	void nearestNeighbor(vector_t, Metric metric);
+	double nearestNeighbor(vector_t, Metric metric);
 
 };
 
