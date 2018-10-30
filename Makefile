@@ -12,10 +12,10 @@ HEADERS=$(wildcard *.h)
 all: lsh cube
 
 cube: LSH.o CUBE.o hash.o cube_.o
-	$(CC) $(LFLAGS) LSH.o CUBE.o hash.o cube.o -o $@
+	$(CC) $(LFLAGS) LSH.o CUBE.o hash.o cube_.o -o $@
 
 lsh: LSH.o CUBE.o hash.o lsh_.o
-	$(CC) $(LFLAGS) LSH.o CUBE.o hash.o lsh.o -o $@
+	$(CC) $(LFLAGS) LSH.o CUBE.o hash.o lsh_.o -o $@
 
 clean: 
 	rm -rf *.o $(OUT)
