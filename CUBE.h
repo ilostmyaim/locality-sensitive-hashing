@@ -23,6 +23,7 @@ private:
 
 public:
 	CUBE(int k=4, int MC=10, int probes=2, std::string inputFile="input_file", std::string outputFile="output_file", std::string queryFile="query_file",Metric = euclidean);
+	void setQueryFileName(std::string newName);
 	int get_k();
 	int get_M();
 	int get_probes();

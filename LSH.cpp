@@ -44,6 +44,11 @@ LSH::LSH(int k, int L, string inputFile, string outputFile, string queryFile,Met
 	}
 }
 
+void LSH::setQueryFileName(string newName)
+{
+	this-> _queryFile = newName;
+}
+
 LSH::~LSH()
 {
 	for(int i = 0;i<_L;i++){

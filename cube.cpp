@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
 	int d,m,probes;
 	string input_file, output_file, query_file, met;
 	Metric metric;
+	string input;
 	/*initialize parameters*/
 	initParametersCube(&d, &m, &probes, input_file, output_file, query_file, met, argc, argv);
 	if(met.compare("cosine") == 0) { 
@@ -33,6 +34,29 @@ int main(int argc, char **argv) {
 
 	
 	cubeObject.executeCUBE(metric);
+
+	while(true) {
+
+		cout.rdbuf(coutbuf);
+
+		cout << "Do you want to use a different query file?(y/n): ";
+		getline(cin, input);
+		if(input.compare("y") == 0){
+			cout << "Enter name/path of query file: ";
+			getline(cin, input);
+
+			ofstream outputFile(output_file);
+			streambuf *coutbuf = cout.rdbuf();
+			cout.rdbuf(outputFile.rdbuf());
+
+			cubeObject.setQueryFileName(input);
+			cubeObject.executeCUBE(metric);
+			continue;
+		}
+		else{
+			break;
+		}
+	}
 	
 	//cubeObject.displayCUBE();
 	

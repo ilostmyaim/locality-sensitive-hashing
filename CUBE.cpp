@@ -48,6 +48,10 @@ CUBE::CUBE(int k, int m, int probes, string inputFile, string outputFile, string
 
 }
 
+void CUBE::setQueryFileName(string newName)
+{
+	this-> _queryFile = newName;
+}
 
 int CUBE::get_k()
 {

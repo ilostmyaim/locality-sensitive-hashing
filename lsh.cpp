@@ -19,6 +19,7 @@ int main(int argc, char **argv) {
 	int k,L;
 	string input_file, output_file, query_file, met;
 	Metric metric;
+	string input;
 	/*initialize parameters*/
 	initParameters(&k, &L, input_file, output_file, query_file, met, argc, argv);
 
@@ -36,9 +37,32 @@ int main(int argc, char **argv) {
 
 	/*execute LSH for givern input and query files*/
 	lshObject.executeLSH(metric);
+
+	while(true) {
+
+		cout.rdbuf(coutbuf);
+
+		cout << "Do you want to use a different query file?(y/n): ";
+		getline(cin, input);
+		if(input.compare("y") == 0){
+			cout << "Enter name/path of query file: ";
+			getline(cin, input);
+
+			ofstream outputFile(output_file);
+			streambuf *coutbuf = cout.rdbuf();
+			cout.rdbuf(outputFile.rdbuf());
+
+			lshObject.setQueryFileName(input);
+			lshObject.executeLSH(metric);
+			continue;
+		}
+		else{
+			break;
+		}
+	}
 	
 	//lshObject.displayLSH();
-	cout.rdbuf(coutbuf);
+	
 	
 	
 

@@ -36,6 +36,7 @@ public:
 	int get_L();
 	std::string get_inputFile();
 	std::string get_outputFile();
+	void setQueryFileName(std::string);
 	void executeLSH(Metric);
 	void displayLSH();
 	void rangeSearch(vector_t q,double R, double C, Metric metric);
